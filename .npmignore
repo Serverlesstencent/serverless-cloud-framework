@@ -1,0 +1,7 @@
+docs
+blog
+/.github
+src
+!dist/*
+examples
+tests
