@@ -339,17 +339,8 @@ const getTemplate = async (root) => {
   return componentDirectoryFound ? template : null;
 };
 
-const SSRComponents = ['nextjs', 'nuxtjs', 'express', 'flask', 'laravel', 'koa', 'egg'];
 const getInstanceDashboardUrl = (instanceYaml) => {
-  let dashboardUrl = `https://serverless.cloud.tencent.com/apps/${instanceYaml.app}/${instanceYaml.name}/${instanceYaml.stage}`;
-  if (SSRComponents.includes(instanceYaml.component)) {
-    dashboardUrl = `https://console.cloud.tencent.com/ssr/detail?stageName=${instanceYaml.stage}&appName=${instanceYaml.app}&instanceName=${instanceYaml.name}&stageList=${instanceYaml.stage}`;
-  }
-  return dashboardUrl;
-};
-
-const getTemplateDashboardUrl = (templateYaml) => {
-  return `前往控制台查看应用详细信息: https://serverless.cloud.tencent.com/?q=${templateYaml.app}`;
+  return `https://console.cloud.tencent.com/sls/detail?stageName=${instanceYaml.stage}&appName=${instanceYaml.app}&instanceName=${instanceYaml.name}&stageList=${instanceYaml.stage}`;
 };
 
 const handleDebugLogMessage = (cli) => {
@@ -621,7 +612,6 @@ module.exports = {
   getDirForInvokeCommand,
   getTemplate,
   getInstanceDashboardUrl,
-  getTemplateDashboardUrl,
   handleDebugLogMessage,
   parseYaml,
   saveYaml,

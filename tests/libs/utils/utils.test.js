@@ -297,22 +297,10 @@ describe('src/libs/utils/utils.js functions test', () => {
   });
 
   test('getInstanceDashboardurl', () => {
-    // SSR component url
     expect(
       utils.getInstanceDashboardUrl({ component: 'koa', stage: 'dev', app: 'test', name: 'test' })
     ).toBe(
-      'https://console.cloud.tencent.com/ssr/detail?stageName=dev&appName=test&instanceName=test&stageList=dev'
-    );
-
-    // non SSR url
-    expect(
-      utils.getInstanceDashboardUrl({ component: 'scf', stage: 'dev', app: 'test', name: 'ins' })
-    ).toBe('https://serverless.cloud.tencent.com/apps/test/ins/dev');
-  });
-
-  test('getTemplateDashboardUrl', () => {
-    expect(utils.getTemplateDashboardUrl({ app: 'test' })).toBe(
-      '前往控制台查看应用详细信息: https://serverless.cloud.tencent.com/?q=test'
+      'https://console.cloud.tencent.com/sls/detail?stageName=dev&appName=test&instanceName=test&stageList=dev'
     );
   });
 

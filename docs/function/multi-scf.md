@@ -1,6 +1,6 @@
 ---
-title: "Tencent Serverless - 多函数应用开发"
-menuText: "多函数应用开发"
+title: 'Tencent Serverless - 多函数应用开发'
+menuText: '多函数应用开发'
 menuOrder: 2
 description: 多函数应用开发
 layout: Doc
@@ -62,10 +62,10 @@ multi-scf-nodejs › 创建成功
 其中函数文件如下:
 
 ```js
-"use strict";
+'use strict';
 exports.index = async (event, context) => {
   return {
-    message: "Tencent SCF execute successful!",
+    message: 'Tencent SCF execute successful!',
     input: event,
   };
 };
@@ -73,7 +73,7 @@ exports.index = async (event, context) => {
 exports.hello = async (event, context) => {
   const name = event.pathParameters.name;
   return {
-    message: `Hello from ${name || "Anonymous"}`,
+    message: `Hello from ${name || 'Anonymous'}`,
     body: event.body || null,
     queries: event.queryString || null,
   };
@@ -114,7 +114,7 @@ inputs:
       function: index
       parameters:
         name: timer1
-        cronExpression: "*/5 * * * * * *" # 每5秒触发一次
+        cronExpression: '*/5 * * * * * *' # 每5秒触发一次
         enable: true
         argument: argument # 额外的参数
     - type: apigw
@@ -144,13 +144,14 @@ inputs:
 这里需要注意
 
 - `app`: 当前 serverless 单函数应用的唯一应用名称（在生成时，为了避免冲突会在结尾添加随机字符串以作区分）。
-- `component`: 要使用的组件，根据不同的开发场景需要使用不同的组件，这里单函数开发使用`scf`组件。
+- `component`: 要使用的组件，根据不同的开发场景需要使用不同的组件，这里单函数开发使用 `scf`组件。
 - `name`: 当前组件的实例名称。这个名称用来在 serverless 应用中识别不同的实例，同一应用内实例名称需要唯一。
-
 - `inputs`: 组件所需要的配置信息，不同组件的配置信息也会不同。全部配置说明请参考 [multi-scf 配置说明](https://github.com/serverless-components/tencent-multi-scf/blob/master/docs/configure.md)。
 - `functions`: 多函数组件配置要暴露函数的对象。
+
   - 函数别名: 对于多函数需要为没个暴露的函数定义一个别名，别名用于在触发器中引用具体函数使用。
     - `handler`: 别名对应的暴露函数的文件名称和文件中的函数名称
+
 - `type`: 函数类型，默认为 `event` 如果进行 WEB 函数开发需要修改为 `web`
 - `triggers`: 函数触发器配置，用于配置如何调用函数，可以通过消息队列，API 网关等多种方式调用。
 
@@ -248,14 +249,14 @@ triggers:
         url:         https://service-4bsxcuby-xxxxxxxxxx.gz.apigw.tencentcs.com
         triggerType: apigw
 
-应用控制台: https://serverless.cloud.tencent.com/apps/my-mscf-node-demo-d5c14120/event_demo/dev
+应用控制台: https://console.cloud.tencent.com/sls/detail?xx
 
 19s › event_demo › 执行成功
 ```
 
 ### 访问函数
 
-部署成功后，通过访问 API 网关的触发器 URL 地址就可以对函数进行访问，这里访问函数`index`的网关地址后会看到函数返回的结果和事件对象:
+部署成功后，通过访问 API 网关的触发器 URL 地址就可以对函数进行访问，这里访问函数 `index`的网关地址后会看到函数返回的结果和事件对象:
 
 ```json
 {
@@ -301,7 +302,7 @@ triggers:
 
 ### 调用函数
 
-部署成功后，使用 `sls invoke -f index` 就可以调用指定函数(调用别名为`index`的函数)，调用成功后会返回调用结果和日志：
+部署成功后，使用 `sls invoke -f index` 就可以调用指定函数(调用别名为 `index`的函数)，调用成功后会返回调用结果和日志：
 
 ```sh
 billDuration:      1
@@ -331,7 +332,7 @@ Serverless: 调用成功
 
 ### 查看日志
 
-部署成功后，使用 `sls logs -f index` 就可以查看指定函数日志(调用别名为`index`的函数)，函数日志执行成功后会返回日志结果：
+部署成功后，使用 `sls logs -f index` 就可以查看指定函数日志(调用别名为 `index`的函数)，函数日志执行成功后会返回日志结果：
 
 ```sh
 serverless ⚡components

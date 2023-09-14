@@ -210,7 +210,7 @@ fullstack-vpc
     subnetId:   subnet-ktdy49n4
     subnetName: serverless
 
-前往控制台查看应用详细信息: https://serverless.cloud.tencent.com/?q=my-fullstack-demo-8ccd1c4a
+前往控制台查看应用详细信息: https://console.cloud.tencent.com/sls/detail?xxx
 
 my-fullstack-demo › 信息成功加载
 ```

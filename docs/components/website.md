@@ -1,6 +1,6 @@
 ---
-title: "Tencent Serverless - 静态网站开发"
-menuText: "静态网站开发"
+title: 'Tencent Serverless - 静态网站开发'
+menuText: '静态网站开发'
 menuOrder: 1
 description: 静态网站开发
 layout: Doc
@@ -74,9 +74,8 @@ inputs:
 这里需要注意
 
 - `app`: 是当前 serverless 单函数应用的唯一应用名称（在生成时，为了避免冲突会在结尾添加随机字符串以作区分）。
-- `component`: 是当前 serverless 要是用的组件，根据不同的开发场景需要使用不同的组件，这里静态网站开发使用`website`组件。
+- `component`: 是当前 serverless 要是用的组件，根据不同的开发场景需要使用不同的组件，这里静态网站开发使用 `website`组件。
 - `name`: 是当前组件的实例名称。这个名称用来在 serverless 应用中识别不同的实例，同一应用内实例名称需要唯一。
-
 - `inputs`: 是组件所需要的配置信息，不同组件的配置信息也会不同。全部配置说明请参考 [腾讯 website 配置说明](https://github.com/serverless-components/tencent-website/blob/master/docs/configure.md)。
 - `src.src`: 是生成的静态网站文件目录。
 - `src.index`: 是静态网站主页文件。
@@ -85,7 +84,7 @@ inputs:
 
 ### 动态构建网站
 
-对于有构建网站步骤的开发流程，需要在`serverless.yml`路径配置中配置构建命令 hook 以及构建后的输出目录路径(具体参考使用框架的说明文档), 在部署之前 Serverless Framework 会自动使用该命令构建网站。
+对于有构建网站步骤的开发流程，需要在 `serverless.yml`路径配置中配置构建命令 hook 以及构建后的输出目录路径(具体参考使用框架的说明文档), 在部署之前 Serverless Framework 会自动使用该命令构建网站。
 
 ```yml
 # nextjs, nuxtjs, react-starter, vue-starter 配置示例
@@ -107,7 +106,7 @@ Action: "deploy" - Stage: "dev" - App: "my-website-demo-968354ba" - Name: "websi
 region:  ap-guangzhou
 website: https://my-website-starter-xxxxxxxxxx.cos-website.ap-guangzhou.myqcloud.com
 
-应用控制台: https://serverless.cloud.tencent.com/apps/my-website-demo-968354ba/websiteDemo/dev
+应用控制台: https://console.cloud.tencent.com/sls/detail?xx
 
 7s › websiteDemo › 执行成功
 ```

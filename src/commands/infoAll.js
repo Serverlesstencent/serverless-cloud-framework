@@ -2,7 +2,7 @@
 
 const { v4: uuidv4 } = require('uuid');
 const { ServerlessSDK } = require('@serverless-cloud-framework/platform-client-china');
-const { getTemplate, getTemplateDashboardUrl } = require('../libs/utils');
+const { getTemplate, getInstanceDashboardUrl } = require('../libs/utils');
 const chalk = require('chalk');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
@@ -93,7 +93,7 @@ module.exports = async (config, cli) => {
     cli.log();
   }
 
-  cli.log(getTemplateDashboardUrl(templateYaml));
+  cli.log(getInstanceDashboardUrl(templateYaml));
 
   cli.sessionStop('success', '信息成功加载');
 };
