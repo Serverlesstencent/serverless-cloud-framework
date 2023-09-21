@@ -1,6 +1,6 @@
 ---
-title: "Tencent Serverless - 框架应用开发"
-menuText: "框架应用开发"
+title: 'Tencent Serverless - 框架应用开发'
+menuText: '框架应用开发'
 menuOrder: 2
 description: 框架应用开发
 layout: Doc
@@ -55,47 +55,47 @@ express-starter › 创建成功
 在目录中 app.js 为 Express 框架的应用文件
 
 ```js
-const express = require("express");
-const multer = require("multer");
-const path = require("path");
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
 
 const app = express();
 
 // Serverless 场景只能读写 /tmp 目录，所以这里需要指定上传文件的目录为 /tmp/upload
-const upload = multer({ dest: "/tmp/upload" });
+const upload = multer({ dest: '/tmp/upload' });
 
 // Routes
 app.get(`/`, (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get("/user", (req, res) => {
+app.get('/user', (req, res) => {
   res.send([
     {
-      title: "serverless framework",
-      link: "https://serverless.com",
+      title: 'serverless framework',
+      link: 'https://serverless.com',
     },
   ]);
 });
 
-app.get("/user/:id", (req, res) => {
+app.get('/user/:id', (req, res) => {
   const id = req.params.id;
   res.send({
     id: id,
-    title: "serverless framework",
-    link: "https://serverless.com",
+    title: 'serverless framework',
+    link: 'https://serverless.com',
   });
 });
 
-app.get("/404", (req, res) => {
-  res.status(404).send("Not found");
+app.get('/404', (req, res) => {
+  res.status(404).send('Not found');
 });
 
-app.get("/500", (req, res) => {
-  res.status(500).send("Server Error");
+app.get('/500', (req, res) => {
+  res.status(500).send('Server Error');
 });
 
-app.post("/upload", upload.single("file"), (req, res) => {
+app.post('/upload', upload.single('file'), (req, res) => {
   res.send({
     success: true,
     data: req.file,
@@ -105,7 +105,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
 // Error handler
 app.use(function (err, req, res, next) {
   console.error(err);
-  res.status(500).send("Internal Serverless Error");
+  res.status(500).send('Internal Serverless Error');
 });
 
 app.listen(9000, () => {
@@ -144,9 +144,8 @@ inputs:
 这里
 
 - `app`: 是当前 serverless 单函数应用的唯一应用名称（在生成时，为了避免冲突会在结尾添加随机字符串以作区分）。
-- `component`: 是当前 serverless 要是用的组件，根据不同的开发场景需要使用不同的组件，这里单函数开发使用`scf`组件。
+- `component`: 是当前 serverless 要是用的组件，根据不同的开发场景需要使用不同的组件，这里单函数开发使用 `scf`组件。
 - `name`: 是当前组件的实例名称。这个名称用来在 serverless 应用中识别不同的实例，同一应用内实例名称需要唯一。
-
 - `inputs`: 是组件所需要的配置信息，不同组件的配置信息也会不同。全部配置说明请参考 [腾讯 http 配置说明](https://github.com/serverless-components/tencent-http/blob/master/docs/configure.md)。
 - `faas.runtime`: 是要使用的运行时。
 - `faas.framework`: 是要使用的框架名称
@@ -219,7 +218,7 @@ apigw:
       url:             https://service-gdwl6why-xxxxxxxxxx.gz.apigw.tencentcs.com/release/
 region: ap-guangzhou
 
-应用控制台: https://serverless.cloud.tencent.com/apps/my-express-demo-2403af93/expressDemo/dev
+应用控制台: https://console.cloud.tencent.com/sls/detail?xxx
 ```
 
 部署完成后通过访问 API 网关的地址就可以访问部署后的应用了。

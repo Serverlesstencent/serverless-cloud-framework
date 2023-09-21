@@ -52,7 +52,7 @@ ${gray('* 直接输入 "serverless-cloud-framework" (或缩写 "scf") 进行项�
 
 ${title('链接')}
 ${gray('产品文档: https://cloud.tencent.com/document/product/1154')}
-${gray('控制面板: https://serverless.cloud.tencent.com/')}
+${gray('控制面板: https://console.cloud.tencent.com/sls')}
 ${gray('问答社区: https://github.com/Serverlesstencent/serverless-cloud-framework/discussions')}
 
 ${title('命令')}

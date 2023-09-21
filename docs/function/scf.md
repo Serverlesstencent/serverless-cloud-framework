@@ -1,6 +1,6 @@
 ---
-title: "Tencent Serverless - 单函数应用开发"
-menuText: "单函数应用开发"
+title: 'Tencent Serverless - 单函数应用开发'
+menuText: '单函数应用开发'
 menuOrder: 1
 description: 单函数应用开发
 layout: Doc
@@ -63,11 +63,11 @@ scf-nodejs › 创建成功
 其中函数文件如下:
 
 ```js
-"use strict";
+'use strict';
 exports.main_handler = async (event, context) => {
-  console.log("Hello World");
+  console.log('Hello World');
   console.log(event);
-  console.log(event["non-exist"]);
+  console.log(event['non-exist']);
   console.log(context);
   return event;
 };
@@ -106,9 +106,8 @@ inputs:
 这里
 
 - `app`: 是当前 serverless 单函数应用的唯一应用名称（在生成时，为了避免冲突会在结尾添加随机字符串以作区分）。
-- `component`: 是当前 serverless 要是用的组件，根据不同的开发场景需要使用不同的组件，这里单函数开发使用`scf`组件。
+- `component`: 是当前 serverless 要是用的组件，根据不同的开发场景需要使用不同的组件，这里单函数开发使用 `scf`组件。
 - `name`: 组件的实例名称。这个名称用来在 serverless 应用中识别不同的实例，同一应用内实例名称需要唯一。
-
 - `inputs`: 组件所需要的配置信息，不同组件的配置信息也会不同。全部配置说明请参考 [腾讯 scf 配置说明](https://github.com/serverless-components/tencent-scf/blob/master/docs/configure.md)。
 - `handler`: 单函数组件要暴露的文件名称和文件中的函数名称。
 - `type`: 函数类型，默认为 `event` 如果进行 WEB 函数开发需要修改为 `web`
@@ -159,7 +158,7 @@ triggers:
     urls:
       - http://service-bylee882-xxxxxxxxxx.gz.apigw.tencentcs.com/release/
 
-应用控制台: https://serverless.cloud.tencent.com/apps/my-scf-node-demo-6d53f98e/scf-nodejs/dev
+应用控制台: https://console.cloud.tencent.com/sls/detail?xx
 
 12s › scf-nodejs › 执行成功
 ```
