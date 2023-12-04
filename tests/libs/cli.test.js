@@ -135,7 +135,7 @@ describe('Test CLI functions', () => {
     );
 
     delete process.env.SERVERLESS_PLATFORM_STAGE;
-    expect(stdoutData).toEqual(expect.stringContaining(`tencent version: ${version}`));
+    expect(stdoutData).toEqual(expect.stringContaining(`serverless-cloud-framework version: ${version}`));
   });
 
   test('logRegistryLogo', () => {

@@ -106,7 +106,7 @@ describe('Test for credentials command: src/commands/credentials', () => {
       await credentialsCmd(config, cli, 'credentials', credentialsPath);
 
       expect(cli.log.mock.calls[0][0]).toMatch(
-        '不存在，请通过 serverless credentials list 查看当前授权信息'
+        '不存在，请通过 scf credentials list 查看当前授权信息'
       );
     });
 

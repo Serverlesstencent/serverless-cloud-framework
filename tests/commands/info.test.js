@@ -73,7 +73,7 @@ describe('get instance info: src/commands/info', () => {
       await infoCmd({ target: './' }, cli, 'info');
     } catch (e) {
       expect(e.message).toBe(
-        '实例 "scf-test" 不是激活状态. 请先部署实例, 然后再次运行"serverless info".'
+        '实例 "scf-test" 不是激活状态. 请先部署实例, 然后再次运行"scf info".'
       );
     }
   });
