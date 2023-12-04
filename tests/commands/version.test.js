@@ -24,7 +24,7 @@ describe('Test scf version command: src/commands/version', () => {
       () => versionCmd({}, cli)
     );
     expect(stdoutData).toMatch(
-      `serverless - tencent version: ${version}(${process.pkg ? 'Binary' : 'npm'})`
+      `serverless-cloud-framework version: ${version}(${process.pkg ? 'Binary' : 'npm'})`
     );
   });
 });

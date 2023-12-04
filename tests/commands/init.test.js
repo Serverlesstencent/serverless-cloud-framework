@@ -62,7 +62,7 @@ describe('scf init command: src/commands/init', () => {
       await initCmd({}, cli);
     } catch (e) {
       expect(e.message).toBe(
-        '请指定 component 或 template 名称，如: "serverless init scf-starter"'
+        '请指定 component 或 template 名称，如: "scf init scf-starter"'
       );
     }
   });
