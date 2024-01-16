@@ -6,7 +6,10 @@
 
 const path = require('path');
 const fs = require('fs');
-const { ServerlessSDK, utils: tencentUtils } = require('@serverless-cloud-framework/platform-client-china');
+const {
+  ServerlessSDK,
+  utils: tencentUtils,
+} = require('@serverless-cloud-framework/platform-client-china');
 const { v4: uuidv4 } = require('uuid');
 const { generatePayload, storeLocally, send: sendTelemtry } = require('../libs/telemtry');
 const utils = require('../libs/utils');
@@ -17,6 +20,7 @@ const chalk = require('chalk');
 const printNotification = require('../libs/notifications/print-notification');
 const { version } = require('../../package.json');
 const { getServerlessFilePath } = require('../libs/serverlessFile');
+const prompts = require('prompts');
 
 const componentsVersion = version;
 
@@ -121,6 +125,7 @@ module.exports = async (config, cli, command) => {
     options.debug = config.debug;
     options.dev = config.dev;
     options.force = config.force;
+    options.forceDelete = config.forceDelete;
     options.noValidation = config.noValidation;
     options.noCache = config.noCache;
     options.componentsVersion = componentsVersion;
@@ -203,9 +208,37 @@ module.exports = async (config, cli, command) => {
         telemtryData.failure_reason = instance.deploymentError;
       }
     } else if (command === 'remove') {
-      // run remove
-      cli.sessionStatus('删除中', null, 'white');
-      await sdk.remove(instanceYaml, instanceCredentials, options);
+      cli.sessionStop('close', '等待确认');
+      let confirm = false;
+      if (options.forceDelete) {
+        cli.log();
+        cli.log(chalk.red('已配置 forceDelete 参数跳过用户确认直接执行注销应用'));
+        confirm = true;
+      } else {
+        const confirmReq = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: '我确认要注销此应用，并删除对应的函数资源。我已知晓这些资源删除后将无法找回?',
+          initial: true,
+        });
+        confirm = confirmReq.value;
+      }
+      if (confirm) {
+        cli.sessionStart('删除中', { timer: true });
+        cli.log();
+        cli.log(chalk.red('您正在尝试注销应用，此操作不可逆，请谨慎操作！'));
+        cli.log(
+          chalk.red(
+            '应用关联的其他云资源（如COS、CLS等），平台均不会关联删除，您可以前往对应产品控制台删除，避免不必要的计费。'
+          )
+        );
+        cli.sessionStatus('删除中', null, 'white');
+        // run remove
+        await sdk.remove(instanceYaml, instanceCredentials, options);
+      } else {
+        cli.log();
+        cli.log('已取消删除');
+      }
     } else if (command === 'bind' && config.params[0] === 'role') {
       await sdk.bindRole(instanceCredentials);
       cli.log('已成功开通 Serverless 相关权限');
@@ -229,7 +262,7 @@ module.exports = async (config, cli, command) => {
         telemtryData.failure_reason = instance.actionError;
       }
     }
-    cli.sessionStop('success', '执行成功');
+    cli.sessionStop('success', '执行完毕');
 
     await storeLocally(telemtryData);
     if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
