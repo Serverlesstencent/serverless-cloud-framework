@@ -208,6 +208,12 @@ module.exports = async (config, cli, command) => {
         telemtryData.failure_reason = instance.deploymentError;
       }
     } else if (command === 'remove') {
+      cli.log();
+      cli.log('您正在尝试删除应用，此操作不可逆，请谨慎操作！', 'red');
+      cli.log(
+        '应用关联的其他云资源（如COS、CLS等），平台均不会关联删除，您可以前往对应产品控制台删除，避免不必要的计费。',
+        'red'
+      );
       cli.sessionStop('close', '等待确认');
       let answer = false;
       if (options.forceDelete) {
@@ -216,7 +222,7 @@ module.exports = async (config, cli, command) => {
         answer = true;
       } else {
         answer = await confirm(
-          '我确认要注销此应用，并删除对应的函数资源。我已知晓这些资源删除后将无法找回?',
+          '我确认要注销此应用，并删除对应的函数资源。我已知晓这些资源删除后将无法找回',
           {
             name: 'removeConfirm',
           }
@@ -224,12 +230,6 @@ module.exports = async (config, cli, command) => {
       }
       if (answer) {
         cli.sessionStart('删除中', { timer: true });
-        cli.log();
-        cli.log('您正在尝试注销应用，此操作不可逆，请谨慎操作！', 'red');
-        cli.log(
-          '应用关联的其他云资源（如COS、CLS等），平台均不会关联删除，您可以前往对应产品控制台删除，避免不必要的计费。',
-          'red'
-        );
         cli.sessionStatus('删除中', null, 'white');
         // run remove
         await sdk.remove(instanceYaml, instanceCredentials, options);
