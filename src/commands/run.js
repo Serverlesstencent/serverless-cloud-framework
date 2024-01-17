@@ -20,7 +20,7 @@ const chalk = require('chalk');
 const printNotification = require('../libs/notifications/print-notification');
 const { version } = require('../../package.json');
 const { getServerlessFilePath } = require('../libs/serverlessFile');
-const prompts = require('prompts');
+const confirm = require('@serverless/utils/inquirer/confirm');
 
 const componentsVersion = version;
 
@@ -209,28 +209,26 @@ module.exports = async (config, cli, command) => {
       }
     } else if (command === 'remove') {
       cli.sessionStop('close', '等待确认');
-      let confirm = false;
+      let answer = false;
       if (options.forceDelete) {
         cli.log();
-        cli.log(chalk.red('已配置 forceDelete 参数跳过用户确认直接执行注销应用'));
-        confirm = true;
+        cli.log('已配置 forceDelete 参数跳过用户确认直接执行注销应用', 'red');
+        answer = true;
       } else {
-        const confirmReq = await prompts({
-          type: 'confirm',
-          name: 'value',
-          message: '我确认要注销此应用，并删除对应的函数资源。我已知晓这些资源删除后将无法找回?',
-          initial: true,
-        });
-        confirm = confirmReq.value;
+        answer = await confirm(
+          '我确认要注销此应用，并删除对应的函数资源。我已知晓这些资源删除后将无法找回?',
+          {
+            name: 'removeConfirm',
+          }
+        );
       }
-      if (confirm) {
+      if (answer) {
         cli.sessionStart('删除中', { timer: true });
         cli.log();
-        cli.log(chalk.red('您正在尝试注销应用，此操作不可逆，请谨慎操作！'));
+        cli.log('您正在尝试注销应用，此操作不可逆，请谨慎操作！', 'red');
         cli.log(
-          chalk.red(
-            '应用关联的其他云资源（如COS、CLS等），平台均不会关联删除，您可以前往对应产品控制台删除，避免不必要的计费。'
-          )
+          '应用关联的其他云资源（如COS、CLS等），平台均不会关联删除，您可以前往对应产品控制台删除，避免不必要的计费。',
+          'red'
         );
         cli.sessionStatus('删除中', null, 'white');
         // run remove

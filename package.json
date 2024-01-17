@@ -76,7 +76,6 @@
     "memoizee": "^0.4.14",
     "minimist": "^1.2.5",
     "prettyoutput": "^1.2.0",
-    "prompts": "^2.4.2",
     "ramda": "^0.27.1",
     "semver": "^7.3.4",
     "strip-ansi": "^6.0.0",
