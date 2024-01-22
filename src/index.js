@@ -3,12 +3,15 @@
 const commands = require('./commands');
 const buildConfig = require('./libs/config');
 const CLI = require('./libs/cli');
+const { checkVersion } = require('./libs/cliUpdater');
 const { standaloneUpgrade } = require('./libs/standalone');
 const { isProjectPath, loadTencentGlobalConfig, ServerlessCLIError } = require('./libs/utils');
 
 module.exports = async () => {
   const config = buildConfig();
   const cli = new CLI(config);
+
+  checkVersion();
 
   const command = config.command;
   try {
@@ -29,6 +32,7 @@ module.exports = async () => {
         '检测到当前目录下已有 serverless 项目，请通过 "scf deploy" 进行部署，或在新路径下完成 serverless 项目初始化'
       );
     }
+
     if (commands[command]) {
       await commands[command](config, cli, command);
     } else {
