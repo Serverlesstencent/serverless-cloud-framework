@@ -1,3 +1,10 @@
 'use strict';
 
-module.exports = require('@serverless/eslint-config/prettier.config');
+module.exports = {
+  eslintIntegration: true,
+  singleQuote: true,
+  printWidth: 120,
+  arrowParens: 'avoid',
+  trailingComma: 'none'
+};
+

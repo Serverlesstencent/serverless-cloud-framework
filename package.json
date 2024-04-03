@@ -23,8 +23,13 @@
     "pkg:build": "node ./scripts/pkg/build.js",
     "pkg:upload": "node ./scripts/pkg/upload/index.js",
     "warmCDN": "node ./scripts/cdnWarmer/index.js",
-    "publish:beta": "npm version prerelease --preid=beta && npm run build && npm publish --tag=beta",
-    "publish:patch": "npm version patch && npm run build && npm publish"
+    "preversion": "git rebase origin/master",
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add -A .",
+    "v-beta": "npm version prerelease --preid=beta",
+    "v-v": "npm run v-patch",
+    "v-patch": "npm version patch",
+    "v-minor": "npm version minor",
+    "v-major": "npm version major"
   },
   "eslintConfig": {
     "extends": "@serverless/eslint-config/node",
@@ -87,6 +92,7 @@
   },
   "devDependencies": {
     "@serverless/eslint-config": "^4.0.0",
+    "conventional-changelog-cli": "^2.1.1",
     "cos-nodejs-sdk-v5": "^2.11.3",
     "eslint": "^8.0.0",
     "eslint-plugin-import": "^2.22.1",
