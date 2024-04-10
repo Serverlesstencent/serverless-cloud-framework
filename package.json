@@ -1,6 +1,6 @@
 {
   "name": "serverless-cloud-framework",
-  "version": "1.0.5",
+  "version": "1.0.6-beta.0",
   "description": "Serverless Tencent command line tool",
   "main": "./dist/index.js",
   "author": "Tencent Cloud, Inc.",
@@ -24,7 +24,8 @@
     "pkg:upload": "node ./scripts/pkg/upload/index.js",
     "warmCDN": "node ./scripts/cdnWarmer/index.js",
     "preversion": "git rebase origin/master",
-    "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add -A .",
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s && add CHANGELOG.md",
+    "postversion": "git push --tags",
     "v-beta": "npm version prerelease --preid=beta",
     "v-v": "npm run v-patch",
     "v-patch": "npm version patch",
