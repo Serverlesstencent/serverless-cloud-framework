@@ -23,14 +23,57 @@
     "pkg:build": "node ./scripts/pkg/build.js",
     "pkg:upload": "node ./scripts/pkg/upload/index.js",
     "warmCDN": "node ./scripts/cdnWarmer/index.js",
-    "preversion": "git rebase origin/master",
-    "version": "conventional-changelog -p angular -i CHANGELOG.md -s && add CHANGELOG.md",
-    "postversion": "git push --tags",
-    "v-beta": "npm version prerelease --preid=beta",
-    "v-v": "npm run v-patch",
-    "v-patch": "npm version patch",
-    "v-minor": "npm version minor",
-    "v-major": "npm version major"
+    "release": "semantic-release"
+  },
+  "release": {
+    "branches": [
+      "master",
+      {
+        "name": "dev",
+        "channel": "beta",
+        "prerelease": "beta"
+      },
+      "next"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      [
+        "@semantic-release/release-notes-generator",
+        {
+          "linkCompare": false,
+          "linkReferences": false
+        }
+      ],
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "package.json",
+            "CHANGELOG.md"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ],
+      [
+        "@tencent/semantic-release-tgit-z",
+        {
+          "assets": [
+            {
+              "path": "dist/*",
+              "label": "npm distribution"
+            }
+          ]
+        }
+      ],
+      [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "npm run build"
+        }
+      ]
+    ]
   },
   "eslintConfig": {
     "extends": "@serverless/eslint-config/node",
@@ -92,7 +135,11 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "5.0.1",
+    "@semantic-release/exec": "^5.0.0",
+    "@semantic-release/git": "9.0.0",
     "@serverless/eslint-config": "^4.0.0",
+    "@tencent/semantic-release-tgit-z": "^1.2.3",
     "conventional-changelog-cli": "^2.1.1",
     "cos-nodejs-sdk-v5": "^2.11.3",
     "eslint": "^8.0.0",
@@ -106,6 +153,7 @@
     "pkg": "^5.5.1",
     "prettier": "^2.4.1",
     "process-utils": "^4.0.0",
+    "semantic-release": "^17.4.7",
     "tencentcloud-sdk-nodejs": "^4.0.301",
     "webpack": "^5.52.1",
     "webpack-cli": "^4.8.0",
