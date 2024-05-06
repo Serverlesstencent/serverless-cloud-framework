@@ -32,9 +32,11 @@ const checkVersion = async () => {
       return;
     }
     const { latestVersion, latestCheckTime } = latestVersionInfo;
-   
-    if (semver.compare(currentVersion, latestVersion) === -1) {
+    const order = semver.compare(currentVersion, latestVersion)
+    if (order === -1) {
       console.log(`CLI版本有可用更新：${dim(currentVersion)} → ${green(latestVersion)}\n执行 ${blue('npm install -g serverless-cloud-framework')} 命令即安装最新版本CLI。更新日志详见：${underline('https://github.com/Serverlesstencent/serverless-cloud-framework/blob/master/CHANGELOG.md')}\n${red('>>> 建议安装最新版本，以获得平台的最新能力和漏洞修复 <<<\n')}`);
+    } else if (order === 1) {
+      console.log('请检测当前CLI版本，并尽量保持使用官方最新版本CLI');
     }
 
     if (checkIfOutdated(latestCheckTime)) {
