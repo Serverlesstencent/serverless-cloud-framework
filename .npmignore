@@ -5,3 +5,4 @@ src
 !dist/*
 examples
 tests
+.code.yml
