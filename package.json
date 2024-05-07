@@ -4,7 +4,6 @@
   "description": "Serverless Tencent command line tool",
   "main": "./dist/index.js",
   "author": "Tencent Cloud, Inc.",
-  "repository": "Serverlesstencent/serverless-cloud-framework",
   "bin": {
     "scf": "./bin/serverless-cloud-framework",
     "serverless-cloud-framework": "./bin/serverless-cloud-framework"
@@ -89,6 +88,7 @@
     "docs/**"
   ],
   "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
   "husky": {
@@ -140,7 +140,6 @@
     "@semantic-release/git": "9.0.0",
     "@serverless/eslint-config": "^4.0.0",
     "@tencent/semantic-release-tgit-z": "^1.2.3",
-    "conventional-changelog-cli": "^2.1.1",
     "cos-nodejs-sdk-v5": "^2.11.3",
     "eslint": "^8.0.0",
     "eslint-plugin-import": "^2.22.1",
