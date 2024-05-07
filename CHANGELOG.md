@@ -1,137 +1,30 @@
-# Changelog
+# 1.1.0-beta.1 (2024-05-07)
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-# [3.21.6](https://github.com/serverless/serverless-tencent/compare/v3.21.5..v3.21.6) (2022-04-27)
+### Features
 
-- Fix app suffix bug while initing template: https://github.com/serverless/serverless-tencent/pull/192
+* 优化检查CLI新版本 4d2456d
+* 如果版本超过最新版本提示用户 4228c04
 
-# [3.21.5](https://github.com/serverless/serverless-tencent/compare/v3.21.4..v3.21.5) (2022-04-20)
+## 1.0.6-beta.0 (2024-04-10)
 
-- Add `sls param` command information on `sls --help` output and website doc: https://github.com/serverless/serverless-tencent/pull/189
+### Features
 
-# [3.21.4](https://github.com/serverless/serverless-tencent/compare/v3.21.3..v3.21.4) (2022-04-13)
+- 优化检查 CLI 新版本
 
-- Fix `invoke local` path error on Windows: https://github.com/serverless/serverless-tencent/pull/182
+## 1.0.5 (2024-1-22)
 
-# [3.21.3](https://github.com/serverless/serverless-tencent/compare/v3.21.2..v3.21.3) (2022-03-30)
+- 执行 scf remove 时需手动确认
+- 新版本提示升级
 
-- Fix exit code issue for YML parsing
-- Detect .env file inside target path
+## 1.0.4 (2023-12-27)
 
-# [3.21.2](https://github.com/serverless/serverless-tencent/compare/v3.21.1..v3.21.2) (2022-03-16)
+升级 @serverless-cloud-framework/platform-client-china 库，压缩 cli 上传代码
 
-- Republish new version for binary upload
+## 1.0.3 (2023-9-21)
 
-# [3.21.1](https://github.com/serverless/serverless-tencent/compare/v3.21.0..v3.21.1) (2022-03-16)
+移除失效链接
 
-- Add metrics for standalone upgrade(https://github.com/serverless/serverless-tencent/pull/155)
-- Fix metrics URL(https://github.com/serverless/serverless-tencent/pull/161)
+## 1.0.2 (2022-10-16)
 
-# [3.21.0](https://github.com/serverless/serverless-tencent/compare/v3.20.3..v3.21.0) (2022-03-09)
-
-- Download binary from CDN to accelerate the process
-
-# [3.20.3](https://github.com/serverless/serverless-tencent/compare/v3.20.2..v3.20.3) (2022-02-23)
-
-- Request new logs only after earlier action succeed
-
-# [3.20.2](https://github.com/serverless/serverless-tencent/compare/v3.20.1..v3.20.2) (2022-02-16)
-
-- Fix `terminal proxy` error
-- Enable users to choose local and global credentials: https://github.com/serverless/serverless-tencent/pull/133
-
-# [3.20.1](https://github.com/serverless/serverless-tencent/compare/v3.20.0...v3.20.1) (2022-02-02)
-
-- Show pure **version** messgae for `version --plain` command
-
-# [3.20.0](https://github.com/serverless/serverless-tencent/compare/v3.19.3...v3.20.0) (2022-01-25)
-
-- Release **3.20.0** for public
-
-# [3.19.3](https://github.com/serverless/serverless-tencent/compare/v3.19.2...v3.19.3) (2022-01-20)
-
-- `help` command will not trigger standalone upgrade
-- Improve standalone ugprade animation
-- The user will not be reminded to upgrade again within seven days after the user chooses not to upgrade.
-- Fix standalone upgrade issue on windows
-- Output detail for `version` command with `binary` or `npm`
-
-# [3.19.2](https://github.com/serverless/serverless-tencent/compare/v3.19.1...v3.19.2) (2022-01-20)
-
-- Fix standalone upgrade on windows
-
-# [3.19.1](https://github.com/serverless/serverless-tencent/compare/v3.19.0...v3.19.1) (2022-01-19)
-
-- Stop polling logs when two errors happen in a row
-- Check if path already exists for sls init
-- Link instance to existed app in sls command
-
-# [3.19.0](https://github.com/serverless/serverless-tencent/compare/v3.16.11...v3.19.0) (2022-01-11)
-
-- Exit process and format msg for errors in dev mode
-- Fix credentials command
-
-# [3.16.11](https://github.com/serverless/serverless-tencent/compare/v3.16.10...v3.16.11) (2022-01-10)
-
-- Add questionnaire notify for users
-- Add `CLI upgrade` notify for **npm installation**
-
-# [3.16.10](https://github.com/serverless/serverless-tencent/compare/v3.16.9...v3.16.10) (2021-12-21)
-
-- Add unit tests for Tencent CLI
-
-# [3.16.9](https://github.com/serverless/serverless-tencent/compare/v3.16.8...v3.16.9) (2021-12-09)
-
-- Change `--skip-update` to `--skipUpdate` for skipping update check
-
-# [3.16.8](https://github.com/serverless/serverless-tencent/compare/v3.16.7...v3.16.8) (2021-12-07)
-
-- Show plain version message by `serverless-tencent version --plain`
-- `--skip-update` option can skip `auto upgrade feature`
-- Use `$HOME/.serverless-tencent` as **CLI resource path**
-
-# [3.16.7](https://github.com/serverless/serverless-tencent/compare/v3.16.6...v3.16.7) (2021-12-07)
-
-- Ignore upgrade feature for `version` command
-
-# [3.16.6](https://github.com/serverless/serverless-tencent/compare/v3.16.5...v3.16.6) (2021-12-06)
-
-- We consider `macos_x64` as `mac_arm64` right now and provide this standalone to `mac arm64` users, due to Github CI has not provide a `mac arm64` environment to build standalone
-
-# [3.16.5](https://github.com/serverless/serverless-tencent/compare/v3.16.4....v3.16.5) (2021-12-01)
-
-- `serverless-tencent CLI` will inform for users to upgrade the standalone CLI if detect a new version except `deploy` commands
-
-# [3.16.4](https://github.com/serverless/serverless-tencent/compare/v3.16.3....v3.16.4) (2021-11-30)
-
-- Test `generate standalone in Github CI` feature
-- Update `window-x64` program
-
-# [3.16.3](https://github.com/serverless/serverless-tencent/compare/v3.16.2....v3.16.3) (2021-11-16)
-
-- Update `name` and `app` fields for generate YML config
-
-# [3.16.2](https://github.com/serverless/serverless-tencent/compare/v3.16.1....v3.16.2) (2021-11-16)
-
-- Upgrade **generate YML config for Node project in http component**
-- Add unit tests
-
-# [3.16.1](https://github.com/serverless/serverless-tencent/compare/v3.16.0....v3.16.1) (2021-11-08)
-
-- Fix loadGlobalCredentials config
-
-# 3.16.0 (2021-11-08)
-
-- Release error message improvement
-- Update major version to make validation alert feasible
-
-# 2.31.0 (2021-10-20)
-
-## Refactor serverless-tencent cli
-
-## improve error message
-
-# 0.0.1 (2021-09-27)
-
-### Init serverless tencent cli
+Init serverless-cloud-framework cli
