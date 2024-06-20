@@ -105,7 +105,7 @@
     ]
   },
   "dependencies": {
-    "@serverless-cloud-framework/platform-client-china": "^1.0.3",
+    "@serverless-cloud-framework/platform-client-china": "^1.0.4",
     "@serverless/utils": "5.20.3",
     "adm-zip": "^0.5.4",
     "ansi-escapes": "^4.3.1",
