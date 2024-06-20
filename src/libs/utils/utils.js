@@ -169,7 +169,7 @@ const loadTencentInstanceConfig = async (directoryPath, command) => {
 const login = async (config = {}) => {
   if (config.useTencentCredential) {
     process.stdout.write(
-      `使用授权信息 ${config.useTencentCredential} 授权中，如果需要使用临时密钥，请使用 --login 重新登陆\n`
+      `使用授权信息 ${config.useTencentCredential} 授权中，如果需要使用临时密钥，请使用 --login 重新登录\n`
     );
   }
 
@@ -187,7 +187,7 @@ const login = async (config = {}) => {
   } catch (e) /* istanbul ignore next */ {
     e.extraErrorInfo = {
       source: 'Tencent::Auth',
-      step: '授权登陆',
+      step: '授权登录',
       referral: 'https://cloud.tencent.com/document/product/598/33168',
     };
     throw e;
