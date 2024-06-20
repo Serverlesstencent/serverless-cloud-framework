@@ -18,7 +18,7 @@ const chalk = require('chalk');
 // const generateNotificationsPayload = require('../libs/notifications/generate-payload');
 // const requestNotification = require('../libs/notifications/request');
 const printNotification = require('../libs/notifications/print-notification');
-const { version } = require('../../package.json');
+const { name: cliName, version } = require('../../package.json');
 const { getServerlessFilePath } = require('../libs/serverlessFile');
 const confirm = require('@serverless/utils/inquirer/confirm');
 
@@ -129,6 +129,7 @@ module.exports = async (config, cli, command) => {
     options.noValidation = config.noValidation;
     options.noCache = config.noCache;
     options.componentsVersion = componentsVersion;
+    options.cliName = cliName;
 
     const cliendUidResult = await utils.writeClientUid();
     if (!cliendUidResult[orgUid]) {
