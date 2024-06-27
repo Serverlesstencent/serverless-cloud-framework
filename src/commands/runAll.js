@@ -9,6 +9,7 @@ const { generatePayload, storeLocally, send: sendTelemtry } = require('../libs/t
 const { v4: uuidv4 } = require('uuid');
 // const requestNotification = require('../libs/notifications/request');
 const printNotification = require('../libs/notifications/print-notification');
+const { name: cliName } = require('../../package.json');
 
 function translateCommand(command) {
   const translateCommandMap = new Map([
@@ -63,6 +64,7 @@ module.exports = async (config, cli, command) => {
 
   // Prepare Options
   const options = {};
+  options.cliName = cliName;
   options.dev = config.dev;
 
   // Connect to Serverless Platform Events, if in debug mode
