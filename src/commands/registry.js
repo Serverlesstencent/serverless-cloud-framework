@@ -8,6 +8,7 @@ const { ServerlessSDK } = require('@serverless-cloud-framework/platform-client-c
 const { v4: uuidv4 } = require('uuid');
 const utils = require('../libs/utils');
 const { loadServerlessFile } = require('../libs/serverlessFile');
+const t = require('../../i18n');
 
 /**
  * Publish a Package(Component or Template) to the Serverless Registry
@@ -19,7 +20,7 @@ const publish = async (config, cli) => {
   config.timer = false;
 
   // Start CLI persistance status
-  cli.sessionStart('初始化中...');
+  cli.sessionStart(t('初始化中...'));
 
   await utils.login(config);
 
@@ -32,7 +33,7 @@ const publish = async (config, cli) => {
 
   if (!serverlessTemplateFile && !serverlessComponentFile && !serverlessFile) {
     throw new utils.ServerlessCLIError(
-      '发布失败。当前工作目录没有包含 "serverless.template.yml" 或者 "serverless.component.yml"'
+      t('发布失败。当前工作目录没有包含 "serverless.template.yml" 或者 "serverless.component.yml"')
     );
   }
 
@@ -64,14 +65,14 @@ const publish = async (config, cli) => {
   // Presentation
   cli.logRegistryLogo();
   cli.log(
-    `发布中 "${finalServerlessFile.name}@${config.dev ? 'dev' : finalServerlessFile.version}"...`,
+    t('发布中 "{{attr0}}@{{attr1}}"...', { attr0: finalServerlessFile.name, attr1: config.dev ? 'dev' : finalServerlessFile.version }),
     'grey'
   );
 
   const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
 
   // Publish
-  cli.sessionStatus('发布中');
+  cli.sessionStatus(t('发布中'));
 
   let registryPackage;
   try {
@@ -83,11 +84,11 @@ const publish = async (config, cli) => {
     } else {
       if (!error.extraErrorInfo) {
         error.extraErrorInfo = {
-          step: '组件发布',
+          step: t('组件发布'),
           source: 'Serverless::Cli',
         };
       } else {
-        error.extraErrorInfo.step = '组件发布';
+        error.extraErrorInfo.step = t('组件发布');
       }
       throw error;
     }
@@ -99,9 +100,7 @@ const publish = async (config, cli) => {
 
   cli.sessionStop(
     'success',
-    `发布成功 ${registryPackage.name}${
-      registryPackage.type === 'template' ? '' : `@${registryPackage.version}`
-    }`
+    t('发布成功 {{attr0}}{{attr1}}', { attr0: registryPackage.name, attr1: registryPackage.type === 'template' ? '' : `@${registryPackage.version}` })
   );
   return null;
 };
@@ -115,7 +114,7 @@ const getPackage = async (config, cli) => {
   const packageName = config.params[0];
 
   // Start CLI persistance status
-  cli.sessionStart(`正在获取版本: ${packageName}`);
+  cli.sessionStart(t('正在获取版本: {{packageName}}', { packageName }));
 
   const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
   let data;
@@ -124,17 +123,17 @@ const getPackage = async (config, cli) => {
   } catch (e) {
     if (!e.extraErrorInfo) {
       e.extraErrorInfo = {
-        step: '组件信息获取',
+        step: t('组件信息获取'),
       };
     } else {
-      e.extraErrorInfo.step = '组件信息获取';
+      e.extraErrorInfo.step = t('组件信息获取');
     }
     throw e;
   }
   delete data.component;
 
   if (Object.keys(data).length === 0) {
-    throw new Error(`所查询的包 "${packageName}" 不存在.`);
+    throw new Error(t('所查询的包 "{{packageName}}" 不存在.', { packageName }));
   }
 
   const devVersion = data.versions.indexOf('0.0.0-dev');
@@ -145,23 +144,23 @@ const getPackage = async (config, cli) => {
   cli.logRegistryLogo();
   cli.log();
   cli.log(`${data.type === 'template' ? 'Template' : 'Component'}: ${packageName}`);
-  cli.log(`描述: ${data.description}`);
+  cli.log(t('描述: {{attr0}}', { attr0: data.description }));
   if (data.type !== 'template') {
-    cli.log(`最新版本: ${data.version}`);
+    cli.log(t('最新版本: {{attr0}}', { attr0: data.version }));
   }
   if (data.author) {
-    cli.log(`作者: ${data.author}`);
+    cli.log(t('作者: {{attr0}}', { attr0: data.author }));
   }
   if (data.repo) {
-    cli.log(`代码地址: ${data.repo}`);
+    cli.log(t('代码地址: {{attr0}}', { attr0: data.repo }));
   }
   cli.log();
   if (data.type !== 'template') {
-    cli.log('可用版本:');
+    cli.log(t('可用版本:'));
     cli.log(`${data.versions.join(', ')}`);
   }
 
-  cli.sessionStop('success', `"${packageName}" 的包信息`);
+  cli.sessionStop('success', t('"{{packageName}}" 的包信息', { packageName }));
   return null;
 };
 
@@ -181,7 +180,7 @@ const listFeatured = async (config, cli) => {
 
     if (featuredTemplates.length > 0) {
       cli.log();
-      cli.log('运行 "scf init <package>" 安装组件或者模版...');
+      cli.log(t('运行 "scf init <package>" 安装组件或者模版...'));
       cli.log();
       for (const featuredTemplate of featuredTemplates) {
         let name = featuredTemplate.name;
@@ -195,15 +194,15 @@ const listFeatured = async (config, cli) => {
         cli.log(`• ${name}`, 'grey');
       }
     }
-    cli.sessionStop('close', '查看更多: https://github.com/serverless-components?q=tencent');
+    cli.sessionStop('close', t('查看更多: https://github.com/serverless-components?q=tencent'));
     return null;
   } catch (e) {
     if (!e.extraErrorInfo) {
       e.extraErrorInfo = {
-        step: '组件列表获取',
+        step: t('组件列表获取'),
       };
     } else {
-      e.extraErrorInfo.step = '组件列表获取';
+      e.extraErrorInfo.step = t('组件列表获取');
     }
     throw e;
   }

@@ -12,7 +12,7 @@ const YAML = require('js-yaml');
 const chalk = require('chalk');
 const traverse = require('traverse');
 const { Graph, alg } = require('graphlib');
-
+const t = require('../../../i18n');
 /**
  * Checks if a file exists
  * @param {*} filePath
@@ -338,7 +338,7 @@ const loadInstanceConfigUncached = (directoryPath) => {
       if (e.name !== 'YAMLException') {
         throw e;
       } else {
-        const err = new Error(`serverless.yml 配置文件格式错误: ${e.message}`);
+        const err = new Error(t('serverless.yml 配置文件格式错误: {{attr0}}', { attr0: e.message }));
         err.extraErrorInfo = {
           referral: '', // TODO: Add yaml referral link
         };
@@ -604,9 +604,9 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, options) =>
   const componentCount = Object.keys(allComponents).length;
   const successCount = options.successCount || 0;
   if (command === 'remove') {
-    cli.sessionStatus(`[${successCount + 1}/${componentCount}] 正在删除 ${leaves.join(', ')}`);
+    cli.sessionStatus(t('[{{attr0}}/{{componentCount}}] 正在删除 {{attr1}}', { attr0: successCount + 1, componentCount, attr1: leaves.join(', ') }));
   } else {
-    cli.sessionStatus(`[${successCount + 1}/${componentCount}] 正在部署 ${leaves.join(', ')}`);
+    cli.sessionStatus(t('[{{attr0}}/{{componentCount}}] 正在部署 {{attr1}}', { attr0: successCount + 1, componentCount, attr1: leaves.join(', ') }));
   }
 
   for (const instanceName of leaves) {
@@ -656,7 +656,7 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, options) =>
 
         if (!options.debug) {
           cli.log();
-          cli.log(chalk.bold(`${instanceName} 部署成功:`));
+          cli.log(chalk.bold(t('{{instanceName}} 部署成功:', { instanceName })));
           cli.log('---------------------------------------------');
           cli.logOutputs(instance.outputs);
         }
@@ -799,7 +799,7 @@ const loadTencentGlobalConfig = (
       if (config.profile || process.env.TENCENT_CREDENTIALS_PROFILE) {
         cli.log(
           `Serverless: ${chalk.yellow(
-            `授权信息 ${profile} 不存在，请通过 serverless credentials list 查看当前授权信息`
+            t('授权信息 {{profile}} 不存在，请通过 serverless credentials list 查看当前授权信息', { profile })
           )}`
         );
         process.exit();

@@ -21,6 +21,7 @@ const printNotification = require('../libs/notifications/print-notification');
 const { name: cliName, version } = require('../../package.json');
 const { getServerlessFilePath } = require('../libs/serverlessFile');
 const confirm = require('@serverless/utils/inquirer/confirm');
+const t = require('../../i18n');
 
 const componentsVersion = version;
 
@@ -59,10 +60,10 @@ module.exports = async (config, cli, command) => {
           'utf8'
         );
         utils.loadInstanceConfig.clear();
-        cli.log('自动生成 serverless.yml 成功，即将部署');
+        cli.log(t('自动生成 serverless.yml 成功，即将部署'));
       } catch (e) {
         e.extraErrorInfo = {
-          step: '配置文件生成',
+          step: t('配置文件生成'),
           source: 'Serverless::CLI',
         };
         throw e;
@@ -70,7 +71,7 @@ module.exports = async (config, cli, command) => {
     }
 
     // Start CLI persistance status
-    cli.sessionStart('正在初始化', { timer: true });
+    cli.sessionStart(t('正在初始化'), { timer: true });
 
     await utils.checkBasicConfigValidation(instanceDir);
 
@@ -88,7 +89,7 @@ module.exports = async (config, cli, command) => {
       cli.log(meta);
     }
 
-    cli.sessionStatus('正在初始化', instanceYaml.name);
+    cli.sessionStatus(t('正在初始化'), instanceYaml.name);
 
     // Load Instance Credentials
     const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage);
@@ -149,7 +150,7 @@ module.exports = async (config, cli, command) => {
         });
       } catch (e) {
         e.extraErrorInfo = {
-          step: '获取调试信息',
+          step: t('获取调试信息'),
         };
         throw e;
       }
@@ -179,7 +180,7 @@ module.exports = async (config, cli, command) => {
         if (statusMsg) {
           cli.sessionStatus(statusMsg, null, 'white');
         } else {
-          cli.sessionStatus('部署中', null, 'white');
+          cli.sessionStatus(t('部署中'), null, 'white');
         }
       };
       const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
@@ -192,7 +193,7 @@ module.exports = async (config, cli, command) => {
       }
       cli.logOutputs(instance.outputs);
       cli.log();
-      cli.log(`${chalk.grey('应用控制台:')} ${utils.getInstanceDashboardUrl(instanceYaml)}`);
+      cli.log(`${chalk.grey(t('应用控制台:'))} ${utils.getInstanceDashboardUrl(instanceYaml)}`);
       if (vendorMessage) {
         cli.log();
         cli.log(`${chalk.green(vendorMessage)}`);
@@ -210,37 +211,37 @@ module.exports = async (config, cli, command) => {
       }
     } else if (command === 'remove') {
       cli.log();
-      cli.log('您正在尝试删除应用，此操作不可逆，请谨慎操作！', 'red');
+      cli.log(t('您正在尝试删除应用，此操作不可逆，请谨慎操作！'), 'red');
       cli.log(
-        '应用关联的其他云资源（如COS、CLS等），平台均不会关联删除，您可以前往对应产品控制台删除，避免不必要的计费。',
+        t('应用关联的其他云资源（如COS、CLS等），平台均不会关联删除，您可以前往对应产品控制台删除，避免不必要的计费。'),
         'red'
       );
-      cli.sessionStop('close', '等待确认');
+      cli.sessionStop('close', t('等待确认'));
       let answer = false;
       if (options.forceDelete) {
         cli.log();
-        cli.log('已配置 forceDelete 参数跳过用户确认直接执行注销应用', 'red');
+        cli.log(t('已配置 forceDelete 参数跳过用户确认直接执行注销应用'), 'red');
         answer = true;
       } else {
         answer = await confirm(
-          '我确认要注销此应用，并删除对应的函数资源。我已知晓这些资源删除后将无法找回',
+          t('我确认要注销此应用，并删除对应的函数资源。我已知晓这些资源删除后将无法找回'),
           {
             name: 'removeConfirm',
           }
         );
       }
       if (answer) {
-        cli.sessionStart('删除中', { timer: true });
-        cli.sessionStatus('删除中', null, 'white');
+        cli.sessionStart(t('删除中'), { timer: true });
+        cli.sessionStatus(t('删除中'), null, 'white');
         // run remove
         await sdk.remove(instanceYaml, instanceCredentials, options);
       } else {
         cli.log();
-        cli.log('已取消删除');
+        cli.log(t('已取消删除'));
       }
     } else if (command === 'bind' && config.params[0] === 'role') {
       await sdk.bindRole(instanceCredentials);
-      cli.log('已成功开通 Serverless 相关权限');
+      cli.log(t('已成功开通 Serverless 相关权限'));
     } else if (command === 'login') {
       // we have do login upside, so if command is login, do nothing here
       // no op
@@ -249,7 +250,7 @@ module.exports = async (config, cli, command) => {
       options.sync = true;
 
       // run a custom method
-      cli.sessionStatus('正在运行', null, 'white');
+      cli.sessionStatus(t('正在运行'), null, 'white');
       // We need to convert xx-yy-zz into xx_yy_zz, due to we can not use a 'xx-yy` as the name of function in nodejs
       command = command.replace(/-/g, '_');
       const instance = await sdk.run(command, instanceYaml, instanceCredentials, options);
@@ -261,7 +262,7 @@ module.exports = async (config, cli, command) => {
         telemtryData.failure_reason = instance.actionError;
       }
     }
-    cli.sessionStop('success', '执行完毕');
+    cli.sessionStop('success', t('执行完毕'));
 
     await storeLocally(telemtryData);
     if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);

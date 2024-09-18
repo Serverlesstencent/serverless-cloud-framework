@@ -5,6 +5,7 @@ const path = require('path');
 const { v4 } = require('uuid');
 const fse = require('fs-extra');
 const { printOutput, colorLog } = require('./utils');
+const t = require('../../../../i18n');
 
 module.exports = async (event, context, handlerFile, handlerFunc, cli) => {
   const tempResFile = `serverless_res_${v4().split('-')[0]}.txt`;
@@ -40,7 +41,7 @@ test()
       cli.log('---------------------------------------------');
       fse.unlinkSync(tempNodeFile);
       fse.unlinkSync(tempResFile);
-      colorLog(`调用错误\n\n ${errData.join('\n').toString()}`, 'red', cli);
+      colorLog(t('调用错误\n\n {{attr0}}', { attr0: errData.join('\n').toString() }), 'red', cli);
       process.exit(1);
     });
 

@@ -12,6 +12,7 @@ const infoAll = require('./infoAll');
 const chalk = require('chalk');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
+const t = require('../../i18n');
 
 dayjs.extend(relativeTime);
 
@@ -59,9 +60,9 @@ module.exports = async (config, cli, command) => {
     );
   } catch (e) {
     if (!e.extraErrorInfo) {
-      e.extraErrorInfo = { step: '实例信息获取' };
+      e.extraErrorInfo = { step: t('实例信息获取') };
     } else {
-      e.extraErrorInfo.step = '实例信息获取';
+      e.extraErrorInfo.step = t('实例信息获取');
     }
     throw e;
   }
@@ -71,7 +72,7 @@ module.exports = async (config, cli, command) => {
   // Throw a helpful error if the instance was not deployed
   if (!instance) {
     throw new Error(
-      `实例 "${instanceYaml.name}" 不是激活状态. 请先部署实例, 然后再次运行"scf info".`
+      t('实例 "{{attr0}}" 不是激活状态. 请先部署实例, 然后再次运行"scf info".', { attr0: instanceYaml.name })
     );
   }
 
@@ -91,9 +92,9 @@ module.exports = async (config, cli, command) => {
   }
 
   cli.log();
-  cli.log(`${chalk.grey('最后操作:')}  ${instance.lastAction} (${lastActionAgo})`);
-  cli.log(`${chalk.grey('部署次数:')}  ${instance.instanceMetrics.deployments}`);
-  cli.log(`${chalk.grey('应用状态:')}  ${statusLog}`);
+  cli.log(`${chalk.grey(t('最后操作:'))}  ${instance.lastAction} (${lastActionAgo})`);
+  cli.log(`${chalk.grey(t('部署次数:'))}  ${instance.instanceMetrics.deployments}`);
+  cli.log(`${chalk.grey(t('应用状态:'))}  ${statusLog}`);
 
   // show error stack if available
   if (instance.deploymentErrorStack) {
@@ -108,7 +109,7 @@ module.exports = async (config, cli, command) => {
     cli.log();
     cli.logOutputs(instance.state);
     cli.log();
-    cli.log(`${chalk.grey('输出:')}`);
+    cli.log(`${chalk.grey(t('输出:'))}`);
   }
 
   if (instance.outputs) {
@@ -119,8 +120,8 @@ module.exports = async (config, cli, command) => {
   }
 
   cli.log();
-  cli.log(`${chalk.grey('应用控制台:')} ${utils.getInstanceDashboardUrl(instanceYaml)}`);
+  cli.log(`${chalk.grey(t('应用控制台:'))} ${utils.getInstanceDashboardUrl(instanceYaml)}`);
 
-  cli.sessionStop('success', '信息成功加载');
+  cli.sessionStop('success', t('信息成功加载'));
   return null;
 };
