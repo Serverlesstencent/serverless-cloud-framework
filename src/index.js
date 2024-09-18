@@ -6,6 +6,7 @@ const CLI = require('./libs/cli');
 const { checkVersion } = require('./libs/cliUpdater');
 const { standaloneUpgrade } = require('./libs/standalone');
 const { isProjectPath, loadTencentGlobalConfig, ServerlessCLIError } = require('./libs/utils');
+const t = require('../i18n');
 
 module.exports = async () => {
   const config = buildConfig();
@@ -19,7 +20,7 @@ module.exports = async () => {
       loadTencentGlobalConfig(cli, config);
     } catch (e) {
       throw new ServerlessCLIError(e.message, {
-        step: '授权登录',
+        step: t('授权登录'),
       });
     }
 
@@ -29,7 +30,7 @@ module.exports = async () => {
 
     if (!config.command) {
       throw new Error(
-        '检测到当前目录下已有 serverless 项目，请通过 "scf deploy" 进行部署，或在新路径下完成 serverless 项目初始化'
+        t('检测到当前目录下已有 serverless 项目，请通过 "scf deploy" 进行部署，或在新路径下完成 serverless 项目初始化')
       );
     }
 

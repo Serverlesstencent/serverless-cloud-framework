@@ -16,18 +16,19 @@ const got = require('got');
 const { ServerlessSDK } = require('@serverless-cloud-framework/platform-client-china');
 const spawn = require('child-process-ext/spawn');
 const { parseYaml, saveYaml, ServerlessCLIError } = require('../libs/utils');
+const t = require('../../i18n');
 
 const pipeline = promisify(stream.pipeline);
 
 async function unpack(cli, dir) {
   if (await fse.exists(path.resolve(dir, 'package.json'))) {
-    cli.sessionStatus(`通过 npm install 在 ${dir} 文件夹中安装依赖`);
+    cli.sessionStatus(t('通过 npm install 在 {{dir}} 文件夹中安装依赖', { dir }));
     try {
       await spawn('npm', ['install'], { cwd: dir });
     } catch (error) {
-      error.message = '自动安装依赖失败，请手动执行安装';
+      error.message = t('自动安装依赖失败，请手动执行安装');
       error.extraErrorInfo = {
-        step: '依赖安装',
+        step: t('依赖安装'),
         source: 'Serverless::CLI',
       };
       throw error;
@@ -68,7 +69,7 @@ const initTemplateFromCli = async ({
     zip.extractAllTo(targetPath);
     await fs.promises.unlink(tmpFilename);
   } catch (e) {
-    e.extraErrorInfo = { step: '模版下载', source: 'Serverless::CLI' };
+    e.extraErrorInfo = { step: t('模版下载'), source: 'Serverless::CLI' };
     throw e;
   }
 
@@ -136,7 +137,7 @@ const init = async (config, cli) => {
       if (config.params && config.params.length > 0) {
         packageName = config.params[0];
       } else {
-        throw new Error('请指定 component 或 template 名称，如: "scf init scf-starter"');
+        throw new Error(t('请指定 component 或 template 名称，如: "scf init scf-starter"'));
       }
     }
 
@@ -147,19 +148,19 @@ const init = async (config, cli) => {
     } catch (e) {
       if (!e.extraErrorInfo) {
         e.extraErrorInfo = {
-          step: '组件信息获取',
+          step: t('组件信息获取'),
         };
       } else {
-        e.extraErrorInfo.step = '组件信息获取';
+        e.extraErrorInfo.step = t('组件信息获取');
       }
       throw e;
     }
     if (!registryPackage) {
       telemtryData.outcome = 'failure';
-      telemtryData.failure_reason = `查询的包 "${packageName}" 不存在.`;
+      telemtryData.failure_reason = t('查询的包 "{{packageName}}" 不存在.', { packageName });
       await storeLocally(telemtryData);
 
-      throw new Error(`查询的包 "${packageName}" 不存在.`);
+      throw new Error(t('查询的包 "{{packageName}}" 不存在.', { packageName }));
     }
 
     // registryPackage.component will be null if component is not found
@@ -167,10 +168,10 @@ const init = async (config, cli) => {
     delete registryPackage.component;
     if (Object.keys(registryPackage).length === 0) {
       telemtryData.outcome = 'failure';
-      telemtryData.failure_reason = `查询的包 "${packageName}" 不存在.`;
+      telemtryData.failure_reason = t('查询的包 "{{packageName}}" 不存在.', { packageName });
       await storeLocally(telemtryData);
 
-      throw new Error(`查询的包 "${packageName}" 不存在.`);
+      throw new Error(t('查询的包 "{{packageName}}" 不存在.', { packageName }));
     }
 
     const targetName = config.name || packageName;
@@ -179,11 +180,11 @@ const init = async (config, cli) => {
 
     if (isPathExists) {
       telemtryData.outcome = 'failure';
-      telemtryData.failure_reason = `尝试创建的文件夹 "${targetPath}" 已存在.`;
+      telemtryData.failure_reason = t('尝试创建的文件夹 "{{targetPath}}" 已存在.', { targetPath });
       await storeLocally(telemtryData);
-      const error = new Error(`文件夹 ${targetName} 已经存在，请修改后重试`);
+      const error = new Error(t('文件夹 {{targetName}} 已经存在，请修改后重试', { targetName }));
       error.extraErrorInfo = {
-        step: '初始化命令',
+        step: t('初始化命令'),
         source: 'Serverless::CLI',
       };
       throw error;
@@ -216,11 +217,11 @@ const init = async (config, cli) => {
       });
     }
 
-    cli.log(`- 项目 "${packageName}" 已在当前目录成功创建`);
-    cli.log(`- 执行 "cd ${targetName} && scf deploy" 部署应用`);
+    cli.log(t('- 项目 "{{packageName}}" 已在当前目录成功创建', { packageName }));
+    cli.log(t('- 执行 "cd {{targetName}} && scf deploy" 部署应用', { targetName }));
 
     await storeLocally(telemtryData);
-    cli.sessionStop('success', '创建成功');
+    cli.sessionStop('success', t('创建成功'));
     return null;
   } catch (err) {
     telemtryData.outcome = 'failure';

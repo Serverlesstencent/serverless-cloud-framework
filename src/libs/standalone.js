@@ -13,6 +13,7 @@ const semver = require('semver');
 const fse = require('fs-extra');
 const stream = require('stream');
 const { promisify } = require('util');
+const t = require('../../i18n');
 
 const pipeline = promisify(stream.pipeline);
 const confirm = require('@serverless/utils/inquirer/confirm');
@@ -114,7 +115,7 @@ const standaloneUpgrade = async (options) => {
   }
 
   if (semver.major(latestVersion) > semver.major(version) && !options.major) {
-    console.log(red('Serverless CLI 有新版本发布，无法自动升级，请手动安装最新版本。'));
+    console.log(red(t('Serverless CLI 有新版本发布，无法自动升级，请手动安装最新版本。')));
     process.exit(1);
   }
 
@@ -134,12 +135,12 @@ const standaloneUpgrade = async (options) => {
     const tid = setTimeout(async () => {
       if (answer === undefined) {
         await writePerference({ standaloneUpgradeExpireDate: Date.now() }); // record the date that users choose don't upgrade
-        console.log('\n超时无响应，已取消升级。');
+        console.log(t('超时无响应，已取消升级。'));
         process.exit(1);
       }
     }, 5000);
 
-    answer = await confirm('Tencent Serverless CLI 有新版本更新，是否立即升级？', {
+    answer = await confirm(t('Tencent Serverless CLI 有新版本更新，是否立即升级？'), {
       name: 'autoUpgradeCLI',
     });
     clearTimeout(tid);
@@ -149,7 +150,7 @@ const standaloneUpgrade = async (options) => {
       return;
     }
 
-    cliProgressFooter.updateProgress(`正在升级 Tencent Serverless CLI ${latestTag}`);
+    cliProgressFooter.updateProgress(t('正在升级 Tencent Serverless CLI {{latestTag}}', {latestTag}));
     const downloadUrl = resolveUrl(latestTag);
 
     await fse.ensureDir(path.dirname(BINARY_PATH));
@@ -167,13 +168,13 @@ const standaloneUpgrade = async (options) => {
     await fsp.rename(BINARY_TMP_PATH, BINARY_PATH);
     await fsp.chmod(BINARY_PATH, 0o755);
 
-    console.log('\n升级成功');
+    console.log(t('升级成功'));
     await storeLocally(standaloneTelemetryPayload);
   } catch (e) {
-    console.log(red(`升级失败: ${e.message}`));
+    console.log(red(t('升级失败: {{msg}}',{msg: e.message})));
 
     e.source = 'Serverless::CLI';
-    e.step = '升级命令行';
+    e.step = t('升级命令行');
     await storeLocally(
       {
         ...standaloneTelemetryPayload,
@@ -190,10 +191,10 @@ const standaloneUpgrade = async (options) => {
 };
 
 const uninstall = async () => {
-  console.log('正在卸载 Tencent Serverless CLI ...');
+  console.log(t('正在卸载 Tencent Serverless CLI ...'));
   await fse.remove(path.dirname(BINARY_PATH));
 
-  console.log('卸载成功');
+  console.log(t('卸载成功'));
 };
 
 module.exports = {

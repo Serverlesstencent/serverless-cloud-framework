@@ -8,6 +8,7 @@ const { red, dim, green, blue, underline } = require('chalk');
 const { version: currentVersion, name: packageName } = require('../../package.json');
 const fs = require('fs');
 const path = require('path');
+const t = require('../../i18n');
 
 const versionLogFile = path.resolve(__dirname, './version.log');
 
@@ -32,11 +33,16 @@ const checkVersion = async () => {
       return;
     }
     const { latestVersion, latestCheckTime } = latestVersionInfo;
-    const order = semver.compare(currentVersion, latestVersion)
+    const order = semver.compare(currentVersion, latestVersion);
     if (order === -1) {
-      console.log(`CLI版本有可用更新：${dim(currentVersion)} → ${green(latestVersion)}\n执行 ${blue('npm install -g serverless-cloud-framework')} 命令即安装最新版本CLI。更新日志详见：${underline('https://github.com/Serverlesstencent/serverless-cloud-framework/blob/master/CHANGELOG.md')}\n${red('>>> 建议安装最新版本，以获得平台的最新能力和漏洞修复 <<<\n')}`);
+      console.log(t('CLI版本有可用更新：{{versionChange}}\n执行{{installCmd}}命令即安装最新版本CLI。更新日志详见：{{docLink}}\n{{msg}}\n'), {
+        versionChange: `${dim(currentVersion)} → ${green(latestVersion)}`,
+        installCmd: blue('npm install -g serverless-cloud-framework'),
+        docLink: underline('https://github.com/Serverlesstencent/serverless-cloud-framework/blob/master/CHANGELOG.md'),
+        msg: red(t('>>> 建议安装最新版本，以获得平台的最新能力和漏洞修复 <<<'))
+      });
     } else if (order === 1) {
-      console.log('请检测当前CLI版本，并尽量保持使用官方最新版本CLI');
+      console.log(t('请检测当前CLI版本，并尽量保持使用官方最新版本CLI'));
     }
 
     if (checkIfOutdated(latestCheckTime)) {
@@ -55,7 +61,7 @@ const resolveLatestTag = async () => {
     const { version } = JSON.parse(body);
     return version;
   } catch (error) {
-    console.log('\n未获取到cli最新版本\n');
+    console.log(t('未获取到cli最新版本'));
     return currentVersion;
   }
 };

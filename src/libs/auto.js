@@ -19,11 +19,12 @@ const {
   getDefaultCredentialsPath,
   fileExistsSync,
   loadTencentGlobalConfig,
-} = require('../libs/utils');
+} = require('./utils');
 const { initTemplateFromCli } = require('../commands/init');
-const { generatePayload, storeLocally } = require('../libs/telemtry');
+const { generatePayload, storeLocally } = require('./telemtry');
 const buildConfig = require('./config');
 const CLI = require('./cli');
+const t = require('../../i18n');
 
 const isValidProjectName = RegExp.prototype.test.bind(/^[a-zA-Z][a-zA-Z0-9-]{0,100}$/);
 const isValidInstanceName = isValidProjectName;
@@ -35,11 +36,11 @@ const projectTypeChoice = async (choices) =>
   (
     await inquirer.prompt({
       // EN: What do you want to make?
-      message: '请选择你希望创建的 Serverless 应用',
+      message: t('请选择你希望创建的 Serverless 应用'),
       type: 'autocomplete',
       name: 'projectType',
-      emptyText: '无结果',
-      searchText: '查询中',
+      emptyText: t('无结果'),
+      searchText: t('查询中'),
       source: async (_, input) => {
         if (input) {
           return choices.filter(
@@ -56,7 +57,7 @@ const projectTypeChoice = async (choices) =>
 const getScfRuntimeTypeChoice = async (choices) =>
   await inquirer.prompt({
     // EN: please choice runtime
-    message: '请选择应用的运行时',
+    message: t('请选择应用的运行时'),
     type: 'list',
     name: 'scfRuntimeType',
     choices,
@@ -65,7 +66,7 @@ const getScfRuntimeTypeChoice = async (choices) =>
 const getMultiScfRuntimeTypeChoice = async (choices) =>
   await inquirer.prompt({
     // EN: please choice runtime
-    message: '请选择应用的运行时',
+    message: t('请选择应用的运行时'),
     type: 'list',
     name: 'multiScfRuntimeType',
     choices,
@@ -75,7 +76,7 @@ const projectNameInput = async (workingDir) =>
   (
     await inquirer.prompt({
       // EN: What do you want to call this project?
-      message: '请输入项目名称',
+      message: t('请输入项目名称'),
       type: 'input',
       name: 'projectName',
       default: 'demo',
@@ -96,7 +97,7 @@ const projectNameInput = async (workingDir) =>
         const projectPath = path.join(workingDir, input);
         return (await isProjectPath(projectPath))
           ? // EN: Serverless project already found at ${input} directory
-            `您的 ${input} 目录中已经存在 Serverless 项目`
+            t('您的 {{input}} 目录中已经存在 Serverless 项目', {input})
           : true;
       },
     })
@@ -167,10 +168,10 @@ const getTemplatesFromRegistry = async (sdk) => {
   } catch (e) {
     if (!e.extraErrorInfo) {
       e.extraErrorInfo = {
-        step: '模版信息获取',
+        step: t('模版信息获取'),
       };
     } else {
-      e.extraErrorInfo.step = '模版信息获取';
+      e.extraErrorInfo.step = t('模版信息获取');
     }
     throw e;
   }
@@ -179,7 +180,7 @@ const getTemplatesFromRegistry = async (sdk) => {
 const getCredentialProfileChoise = async (profiles) =>
   (
     await inquirer.prompt({
-      message: '请选择你要部署的授权信息',
+      message: t('请选择你要部署的授权信息'),
       type: 'list',
       name: 'chosenProfile',
       choices: profiles,
@@ -189,7 +190,7 @@ const getCredentialProfileChoise = async (profiles) =>
 const getAppNameChoice = async (appNames) =>
   (
     await inquirer.prompt({
-      message: '请选择你希望关联的 Serverless 应用',
+      message: t('请选择你希望关联的 Serverless 应用'),
       type: 'list',
       name: 'chosenAppName',
       choices: appNames,
@@ -199,7 +200,7 @@ const getAppNameChoice = async (appNames) =>
 const inputInstanceName = async (workingDir) =>
   (
     await inquirer.prompt({
-      message: '请输入实例名称',
+      message: t('请输入实例名称'),
       type: 'input',
       name: 'instanceName',
       default: 'demo',
@@ -216,7 +217,7 @@ const inputInstanceName = async (workingDir) =>
         const projectPath = path.join(workingDir, input);
         return (await isProjectPath(projectPath))
           ? // EN: Serverless project already found at ${input} directory
-            `您的 ${input} 目录中已经存在 Serverless 实例`
+            t('您的 {{input}} 目录中已经存在 Serverless 实例', {input})
           : true;
       },
     })
@@ -238,7 +239,7 @@ const getLocalEnvContent = () => {
 module.exports = async () => {
   if (await isProjectPath(process.cwd())) {
     throw new Error(
-      '检测到当前目录下已有 serverless 项目，请通过 "sls deploy" 进行部署，或在新路径下完成 serverless 项目初始化'
+      t('检测到当前目录下已有 serverless 项目，请通过 "scf deploy" 进行部署，或在新路径下完成 serverless 项目初始化')
     );
   }
   const config = buildConfig();
@@ -248,7 +249,7 @@ module.exports = async () => {
   // As this function is configured to be invoked only in such case
   if (
     // EN: No project detected. Do you want to create a new one?'
-    !(await confirm('当前未检测到 Serverless 项目，是否希望新建一个项目？', {
+    !(await confirm(t('当前未检测到 Serverless 项目，是否希望新建一个项目？'), {
       name: 'shouldCreateNewProject',
     }))
   ) {
@@ -263,7 +264,7 @@ module.exports = async () => {
       await getTemplatesFromRegistry(sdk);
     if (templatesChoices.length === 0) {
       // EN: Can not find any template in registry!
-      cli.log(chalk.red('当前注册中心无可用模版!\n'));
+      cli.log(chalk.red(t('当前注册中心无可用模版!')));
       return null;
     }
     // console.log(templatesChoices)
@@ -298,7 +299,7 @@ module.exports = async () => {
       currentCredentials.tencent.SecretId &&
       currentCredentials.tencent.SecretKey
     ) {
-      if (await confirm('是否关联到已有应用？')) {
+      if (await confirm(t('是否关联到已有应用？'))) {
         const credentialsPath = getDefaultCredentialsPath();
         // Choose credential profile
         if (fileExistsSync(credentialsPath)) {
@@ -313,11 +314,11 @@ module.exports = async () => {
           }
           const profiles = [];
           if (hasLocalEnv) {
-            profiles.push('当前目录授权(.env)');
+            profiles.push(t('当前目录授权(.env)'));
           }
           const credentialsObj = loadCredentialsToJson(credentialsPath);
           if (typeof credentialsObj === 'object') {
-            profiles.push(...Object.keys(credentialsObj).map((key) => `全局授权-${key}`));
+            profiles.push(...Object.keys(credentialsObj).map((key) => t('全局授权-{{key}}', {key})));
           }
           let chosenProfile;
           if (profiles && profiles.length > 1) {
@@ -339,8 +340,8 @@ module.exports = async () => {
         } catch (error) {
           cli.logError(
             {
-              message: '无法获取用户应用信息，请检查授权信息后重试',
-              step: '获取用户应用信息',
+              message: t('无法获取用户应用信息，请检查授权信息后重试'),
+              step: t('获取用户应用信息'),
               source: 'Serverless::CLI',
             },
             { command: 'auto' }
@@ -363,7 +364,7 @@ module.exports = async () => {
           const orgUid = await chinaUtils.getOrgId();
           cli.log(
             `Serverless: ${chalk.yellow(
-              `当前账户 ${orgUid} 没有已部署的 Serverless 应用，请检查或创建新项目`
+              t('当前账户 {{orgUid}} 没有已部署的 Serverless 应用，请检查或创建新项目', {orgUid})
             )}`
           );
         }
@@ -383,7 +384,7 @@ module.exports = async () => {
 
     cli.log(
       // EN: Downloading ${projectType.name} app...
-      `Serverless: ${chalk.yellow(`正在安装 ${name} 应用...`)}\n`
+      `Serverless: ${chalk.yellow(t('正在安装 {{name}} 应用...', {name}))}\n`
     );
 
     // Get detailed information about the selected template
@@ -403,12 +404,12 @@ module.exports = async () => {
       instanceName,
     });
 
-    cli.log(`- 项目 "${chosenAppName ? instanceName : projectName}" 已在当前目录成功创建`);
+    cli.log(t('- 项目 "{{name}" 已在当前目录成功创建', {name: chosenAppName ? instanceName : projectName}));
     cli.log(
-      `- 执行 "cd ${chosenAppName ? instanceName : projectName} && scf deploy" 部署应用`
+      t('- 执行 "cd {{name}} && scf deploy" 部署应用', {name: chosenAppName ? instanceName : projectName})
     );
 
-    cli.sessionStop('success', '创建成功');
+    cli.sessionStop('success', t('创建成功'));
 
     // save onboarding action data
     telemtryData = await generatePayload({
@@ -420,7 +421,7 @@ module.exports = async () => {
 
     if (
       // EN: Do you want to deploy your project on the cloud now?
-      !(await confirm('是否希望立即将该项目部署到云端？', {
+      !(await confirm(t('是否希望立即将该项目部署到云端？'), {
         name: 'shouldDeployNewProject',
       }))
     ) {

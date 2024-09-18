@@ -11,6 +11,7 @@ const runPython = require('./runPython');
 const runPhp = require('./runPhp');
 const runNode = require('./runNode');
 const { generatePayload, storeLocally } = require('../../../libs/telemtry');
+const t = require('../../../../i18n');
 
 module.exports = async (config, cli, command, instanceDir) => {
   const { config: ymlFilePath, c } = config;
@@ -29,9 +30,9 @@ module.exports = async (config, cli, command, instanceDir) => {
         await storeLocally({
           ...telemtryData,
           outcome: 'failure',
-          failure_reason: '指定的yml文件不存在',
+          failure_reason: t('指定的yml文件不存在'),
         });
-        throw new Error('指定的yml文件不存在');
+        throw new Error(t('指定的yml文件不存在'));
       }
       instanceYml = utils.readAndParseSync(customizedConfigFile);
     }
@@ -43,9 +44,9 @@ module.exports = async (config, cli, command, instanceDir) => {
       await storeLocally({
         ...telemtryData,
         outcome: 'failure',
-        failure_reason: '当前命令只支持 SCF 组件，请在 SCF 组件目录内使用',
+        failure_reason: t('当前命令只支持 SCF 组件，请在 SCF 组件目录内使用'),
       });
-      colorLog('当前命令只支持 SCF 组件，请在 SCF 组件目录内使用', 'yellow', cli);
+      colorLog(t('当前命令只支持 SCF 组件，请在 SCF 组件目录内使用'), 'yellow', cli);
     }
 
     try {
@@ -72,7 +73,7 @@ module.exports = async (config, cli, command, instanceDir) => {
         }
       } catch (e) {
         e.extraErrorInfo = {
-          step: '函数本地调用',
+          step: t('函数本地调用'),
           source: 'Serverless::Cli',
         };
         throw e;

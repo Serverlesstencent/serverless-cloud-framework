@@ -11,6 +11,7 @@ const credentials = require('./credentials');
 const invoke = require('./invoke');
 const logs = require('./logs');
 const version = require('./version');
+const lang = require('./lang');
 
 module.exports = {
   run,
@@ -24,4 +25,5 @@ module.exports = {
   credentials,
   invoke,
   logs,
+  lang
 };

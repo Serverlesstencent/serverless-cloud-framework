@@ -14,6 +14,7 @@ const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
 const { loadInstanceConfig, fileExistsSync } = require('./utils');
 const CLI = require('./cli');
+const t = require('../../i18n');
 
 module.exports = () => {
   const args = minimist(process.argv.slice(2));
@@ -135,7 +136,7 @@ module.exports = () => {
         if (regexForComment.test(envValue)) {
           console.log(
             chalk.yellow(
-              `在dotenv配置中字段${key}发现 #,请确保注释都写在单独由#开头的新一行, 不支持行内注释。详情查看：https://github.com/motdotla/dotenv#rules\n`
+              t('在dotenv配置中字段{{key}}发现 #,请确保注释都写在单独由#开头的新一行, 不支持行内注释。详情查看：https://github.com/motdotla/dotenv#rules\n', { key })
             )
           );
         }
@@ -176,11 +177,11 @@ module.exports = () => {
     config.command = command;
   } catch (e) /* istanbul ignore next */ {
     if (e.extraErrorInfo) {
-      e.extraErrorInfo.step = '命令初始化';
+      e.extraErrorInfo.step = t('命令初始化');
       e.extraErrorInfo.source = 'Serverless::CLI';
     } else {
       e.extraErrorInfo = {
-        step: '命令初始化配置',
+        step: t('命令初始化配置'),
         source: 'Serverless::CLI',
       };
     }
