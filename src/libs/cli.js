@@ -217,15 +217,15 @@ module.exports = class CLI {
     // Add space
     console.log('');
 
-    let basicInfo = t(`帮助文档:    https://cloud.tencent.com/document/product/1154/38790
-BUG提交:     https://github.com/Serverlesstencent/serverless-cloud-framework/issues
-问答社区:    https://github.com/Serverlesstencent/serverless-cloud-framework/discussions`);
+    let basicInfo = `${t('帮助文档')}:    https://cloud.tencent.com/document/product/1154/38790
+${t('BUG提交')}:     https://github.com/Serverlesstencent/serverless-cloud-framework/issues
+${t('问答社区')}:    https://github.com/Serverlesstencent/serverless-cloud-framework/discussions`;
 
     const extraErrorInfo = error.extraErrorInfo || {};
 
     const referral = error.referral || extraErrorInfo.referral;
     if (referral) {
-      basicInfo = t('参考信息:    {{referral}}{{basicInfo}}', { referral, basicInfo });
+      basicInfo = `${t('参考信息')}:    ${referral}${basicInfo}`;
     }
 
     // Write to terminal

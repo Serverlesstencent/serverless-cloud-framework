@@ -260,5 +260,10 @@
     "k_0p4jg3n": "指定要使用的本机中的Php版本，默认使用php. 如: --php php7.2 (此配置只对runtime是Php的配置有效)",
     "k_0i9uiy6": "在项目中配置参数,支持多参数配置: scf param set key1=value1 key2=value2",
     "k_0481f0h": "在项目中获取并展示已配置的所有参数",
-    "k_1c4r9b6": "没有找到 \"{{commandName}}\" 命令. 你想查看的是 \"{{suggestion}}\" 的帮助信息吗? 可以通过 \"scf help\" 查看所有可用命令"
+    "k_1c4r9b6": "没有找到 \"{{commandName}}\" 命令. 你想查看的是 \"{{suggestion}}\" 的帮助信息吗? 可以通过 \"scf help\" 查看所有可用命令",
+    "k_0uqede4": "查看模版信息",
+    "k_150zc86": "帮助文档",
+    "k_1p54nvl": "BUG提交",
+    "k_1605f0b": "问答社区",
+    "k_13ly2yy": "参考信息"
 }

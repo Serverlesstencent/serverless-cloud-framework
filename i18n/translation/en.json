@@ -260,5 +260,10 @@
   "k_0p4jg3n": "Specify PHP Version to Use from the Local Machine, default: php. e.g., --php php7.2 (this configuration only applies to PHP runtime)",
   "k_0i9uiy6": "Configure Parameters in the Project, supports multiple parameter configurations: scf param set key1=value1 key2=value2",
   "k_0481f0h": "Retrieve and Display All Configured Parameters in the Project",
-  "k_1c4r9b6": "Command \"{{commandName}}\" not found. Did you mean to view help information for \"{{suggestion}}\"? You can use \"scf help\" to view all available commands."
+  "k_1c4r9b6": "Command \"{{commandName}}\" not found. Did you mean to view help information for \"{{suggestion}}\"? You can use \"scf help\" to view all available commands.",
+  "k_0uqede4": "View Template Information",
+  "k_150zc86": "Help Documentation",
+  "k_1p54nvl": "Bug Submission",
+  "k_1605f0b": "Q&A Community",
+  "k_13ly2yy": "Reference Information"
 }
