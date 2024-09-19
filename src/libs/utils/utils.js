@@ -623,4 +623,5 @@ module.exports = {
   loadTencentInstanceConfig,
   ServerlessCLIError,
   writePerference,
+  updateEnvFile
 };

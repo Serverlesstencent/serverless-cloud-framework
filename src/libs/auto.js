@@ -239,7 +239,7 @@ const getLocalEnvContent = () => {
 module.exports = async () => {
   if (await isProjectPath(process.cwd())) {
     throw new Error(
-      t('检测到当前目录下已有 serverless 项目，请通过 "sls deploy" 进行部署，或在新路径下完成 serverless 项目初始化')
+      t('检测到当前目录下已有 serverless 项目，请通过 "scf deploy" 进行部署，或在新路径下完成 serverless 项目初始化')
     );
   }
   const config = buildConfig();

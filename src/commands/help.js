@@ -69,6 +69,7 @@ ${command('remove')}           ${t('移除应用')}
 ${command('credentials')}      ${t('管理全局授权信息')}
 ${command('registry')}         ${t('查看模版信息')}
 ${command('bind role')}        ${t('重新为当前用户分配使用 Serverless 所需权限')}
+${command('lang')}             ${t('查看和管理语言配置')}
 ${scfCommands}
 ${paramCommands}
   `
@@ -177,6 +178,10 @@ ${command2(
     'param list': `
 ${command2('param list')}              ${t('在项目中获取并展示已配置的所有参数')}
 `,
+    'lang': `
+${command2('lang')}                  ${t('查看当前语言')}
+${description(`    {language}          ${t('指定语言，en为英文，zh为中文')}
+`)}`
   };
 
   if (allowedCommands[commandName]) {
