@@ -1,3 +1,10 @@
+# 1.3.0-beta.5 (2024-09-20)
+
+
+### Features
+
+* update platform-client-china b8cc474
+
 # 1.3.0-beta.4 (2024-09-19)
 
 
