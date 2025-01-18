@@ -1,6 +1,6 @@
 {
   "name": "serverless-cloud-framework",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Serverless Tencent command line tool",
   "main": "./dist/index.js",
   "author": "Tencent Cloud, Inc.",
