@@ -106,6 +106,109 @@ const publish = async (config, cli) => {
   return null;
 };
 
+
+/**
+ * rollback a Package(Component or Template) version
+ * @param {*} config
+ * @param {*} cli
+ */
+const rollback = async (config, cli) => {
+  const rollBackVersion = config.rollback || config.r;
+  // --rollback/-r参数未传版本号或者版本号格式错误，会提示报错
+  if (!/^\d+\.\d+\.\d+$/.test(rollBackVersion)) {
+    throw new utils.ServerlessCLIError(
+      `回滚失败:--rollback/-r参数没有设置版本号或者版本号格式错误,版本号格式:'0.0.0'`
+    );
+  }
+  // Disable timer
+  config.timer = false;
+
+  // Start CLI persistance status
+  cli.sessionStart('初始化中...');
+
+  await utils.login(config);
+
+  // We want to check the existence of serverless.template.yml and serverless.component.yml first
+  // If both of them did not show up, we will check serverless.yml for backward compatibility
+  // Why not check the existence of serverless.yml first? serverless.template.yml and serverless.yml may be in the same folder
+  const serverlessTemplateFile = await utils.loadTemplateConfig(process.cwd());
+  const serverlessComponentFile = await utils.loadComponentConfig(process.cwd());
+  const serverlessFile = await loadServerlessFile(process.cwd());
+
+  if (!serverlessTemplateFile && !serverlessComponentFile && !serverlessFile) {
+    throw new utils.ServerlessCLIError(
+      '回滚失败。当前工作目录没有包含 "serverless.template.yml" 或者 "serverless.component.yml"'
+    );
+  }
+
+
+  let finalServerlessFile;
+
+  if (serverlessComponentFile) {
+    // Rollbacking a component
+    finalServerlessFile = serverlessComponentFile;
+    finalServerlessFile.src = serverlessComponentFile.main;
+    finalServerlessFile.type = 'component';
+  } else {
+    // Rollbacking a template
+    finalServerlessFile = serverlessTemplateFile || serverlessFile;
+    finalServerlessFile.type = 'template';
+  }
+
+  if (config.dev) {
+    finalServerlessFile.version = 'dev';
+  }
+
+  if (rollBackVersion) {
+    finalServerlessFile.actionType = utils.ACTION_TYPE_ENUM.ROLLBACK
+    finalServerlessFile.rollbackVersion = rollBackVersion
+  }
+
+  // fall back to service name for framework v1
+  finalServerlessFile.name = finalServerlessFile.name || finalServerlessFile.service;
+  finalServerlessFile.org = finalServerlessFile.org || (await utils.getDefaultOrgName());
+
+  // Presentation
+  cli.logRegistryLogo();
+  cli.log(
+    `回滚中 "${finalServerlessFile.name}@${finalServerlessFile.rollbackVersion}"...`,
+    'grey'
+  );
+
+  const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
+
+  // Publish
+  cli.sessionStatus('回滚中');
+
+  let registryPackage;
+  try {
+    registryPackage = await sdk.rollbackPackage(finalServerlessFile);
+  } catch (error) {
+    if (error.message.includes('409')) {
+      error.message = error.message.replace('409 - ', '');
+      cli.error(error.message, true);
+    } else {
+      if (!error.extraErrorInfo) {
+        error.extraErrorInfo = {
+          step: '组件回滚',
+          source: 'Serverless::Cli',
+        };
+      } else {
+        error.extraErrorInfo.step = '组件回滚';
+      }
+      throw error;
+    }
+  }
+
+  cli.sessionStop(
+    'success',
+    `回滚成功 ${finalServerlessFile.name}${
+      finalServerlessFile.type === 'template' ? '' : `@${finalServerlessFile.rollbackVersion}`
+    }`
+  );
+  return null;
+};
+
 /**
  * Get a registry package from the Serverless Registry
  * @param {*} config
@@ -217,7 +320,14 @@ module.exports = async (config, cli) => {
     return await listFeatured(config, cli);
   }
   if (config.params[0] === 'publish') {
-    return await publish(config, cli);
+    const rollBackVersion = config.rollback || config.r;
+    // 如果publish命令传递了--rollback/-r参数，则进行回滚版本
+    if (rollBackVersion) {
+      return await rollback(config, cli);
+    } else {
+      // 反之,如果publish命令没有传递--rollback/-r参数，则进行发布版本
+      return await publish(config, cli);
+    }
   }
   return await getPackage(config, cli);
 };

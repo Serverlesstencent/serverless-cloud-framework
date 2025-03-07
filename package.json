@@ -1,6 +1,6 @@
 {
   "name": "serverless-cloud-framework",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Serverless Tencent command line tool",
   "main": "./dist/index.js",
   "author": "Tencent Cloud, Inc.",
@@ -105,7 +105,7 @@
     ]
   },
   "dependencies": {
-    "@serverless-cloud-framework/platform-client-china": "^1.0.6",
+    "@serverless-cloud-framework/platform-client-china": "^1.0.7",
     "@serverless/utils": "5.20.3",
     "adm-zip": "^0.5.4",
     "ansi-escapes": "^4.3.1",
