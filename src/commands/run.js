@@ -240,7 +240,15 @@ module.exports = async (config, cli, command) => {
         cli.log(t('已取消删除'));
       }
     } else if (command === 'bind' && config.params[0] === 'role') {
-      await sdk.bindRole(instanceCredentials);
+      await sdk.bindRole(instanceCredentials,
+        {
+          ...options,
+          region: process.env.SERVERLESS_PLATFORM_STAGE === 'dev' ? 'ap-shanghai' : 'ap-guangzhou',
+          token: process.env.TENCENT_TOKEN,
+          sdkAgent: sdk.agent,
+          traceId: sdk.context.traceId,
+        }
+      );
       cli.log(t('已成功开通 Serverless 相关权限'));
     } else if (command === 'login') {
       // we have do login upside, so if command is login, do nothing here
