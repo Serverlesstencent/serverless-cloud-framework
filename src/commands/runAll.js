@@ -76,24 +76,7 @@ module.exports = async (config, cli, command) => {
     options.client_uid = cliendUidResult.value;
   }
 
-  if (options.debug) {
-    await sdk.connect({
-      filter: {
-        stageName: templateYaml.stage,
-        appName: templateYaml.app,
-      },
-      onEvent: utils.handleDebugLogMessage(cli),
-    });
-  }
-
   const deferredNotificationsData = null;
-    // command === 'deploy'
-    //   ? requestNotification(
-    //       Object.assign(generateNotificationsPayload(templateYaml), {
-    //         command: 'deploy',
-    //       })
-    //     )
-    //   : null;
 
   if (command === 'remove') {
     cli.sessionStatus(t('正在删除'), null, 'white');

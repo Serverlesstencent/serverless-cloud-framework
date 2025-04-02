@@ -136,35 +136,9 @@ module.exports = async (config, cli, command) => {
     if (!cliendUidResult[orgUid]) {
       options.client_uid = cliendUidResult.value;
     }
-
-    // Connect to Serverless Platform Events, if in debug mode
-    if (options.debug) {
-      try {
-        await sdk.connect({
-          filter: {
-            stageName: instanceYaml.stage,
-            appName: instanceYaml.app,
-            instanceName: instanceYaml.name,
-          },
-          onEvent: utils.handleDebugLogMessage(cli),
-        });
-      } catch (e) {
-        e.extraErrorInfo = {
-          step: t('获取调试信息'),
-        };
-        throw e;
-      }
-    }
-
     let deferredNotificationsData;
     if (command === 'deploy') {
       deferredNotificationsData = null;
-      // requestNotification(
-      //   Object.assign(generateNotificationsPayload(instanceYaml), {
-      //     command: 'deploy',
-      //   })
-      // );
-
       // Warn about dev agent
       if (options.dev) {
         cli.log();

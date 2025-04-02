@@ -577,9 +577,6 @@ const writeClientUid = async (p = clientUidDefaultPath, options = {}) => {
       writeJsonToCredentials(p, {
         client_uid: res,
       });
-      const { sendToMetrics } = require('../telemtry/index');
-
-      await sendToMetrics(res, {}, { initClientUid: true });
     } else {
       res = loadCredentialsToJson(p).client_uid;
     }
