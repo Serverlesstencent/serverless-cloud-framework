@@ -14,36 +14,6 @@ const timestampWeekBefore = Date.now() - 1000 * 60 * 60 * 24 * 7;
 const isUuid = RegExp.prototype.test.bind(
   /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
 );
-
-const sendToMetrics = async (payload, { ids }, options = {}) => {
-  const metricsUrl = chinaUtils.getMetricsUrl();
-
-  if (!metricsUrl) return null;
-
-  try {
-    await got.post(metricsUrl, {
-      json: {
-        cliName: '@serverless/components',
-        type: 'componentsMetrics',
-        payload,
-        ...options,
-      },
-      responseType: 'json',
-    });
-    if (ids) {
-      await Promise.all(
-        ids.map(async (id) => {
-          const cachePath = join(cacheDirPath, id);
-          await fse.unlink(cachePath);
-        })
-      );
-    }
-  } catch (e) {
-    return null;
-  }
-  return null;
-};
-
 // Store telemtry data locally and send them later while deploying
 const storeLocally = async (payload = {}, err = null) => {
   if (err) {
@@ -123,16 +93,7 @@ const send = async () => {
 
   if (!payloadsWithIds.length) return null;
 
-  await sendToMetrics(
-    payloadsWithIds
-      .map((item) => item.payload)
-      .sort((item, other) => item.timestamp - other.timestamp),
-    {
-      ids: payloadsWithIds.map((item) => item.id),
-    }
-  );
-
   return null;
 };
 
-module.exports = { storeLocally, send, generatePayload, sendToMetrics };
+module.exports = { storeLocally, send, generatePayload };

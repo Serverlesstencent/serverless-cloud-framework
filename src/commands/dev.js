@@ -15,6 +15,7 @@ const { v4: uuidv4 } = require('uuid');
 const utils = require('../libs/utils');
 const chalk = require('chalk');
 const t = require('../../i18n');
+const { name: cliName } = require('../../package.json');
 
 class LogForwardingOutput extends Writable {
   _write(chunk, encoding, callback) {
@@ -75,9 +76,10 @@ async function deploy(sdk, instance, credentials) {
     }
   }
   let instanceInfo = {};
-
+  const options = {};
+  options.cliName = cliName;
   try {
-    await sdk.deploy(instance, credentials);
+    await sdk.deploy(instance, credentials,options);
     const instanceStatusPollingStartTime = new Date().getTime();
     instanceInfo = await getInstanceInfo(sdk, instance);
     while (instanceInfo.instanceStatus === 'deploying') {
