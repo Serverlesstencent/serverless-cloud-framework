@@ -1,3 +1,12 @@
+# 1.3.0 (2025-04-09)
+
+
+### Features
+
+* apigw net offline b7465d5
+* cli本地持配置语言，默认英文 c6c28af
+* 删除scf param参数 8045837
+
 # 1.3.0-beta.5 (2024-09-20)
 
 
@@ -40,15 +49,7 @@
 
 ### Bug Fixes
 
-
-### Features
-
-* i18n 6e4e0ef
 * cli客户端放开700m code size limit 1e4f752
-
-
-
-
 
 # 1.2.0 (2024-06-27)
 
