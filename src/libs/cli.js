@@ -13,6 +13,7 @@ const prettyoutput = require('prettyoutput');
 const chokidar = require('chokidar');
 const packageInfo = require('../../package.json');
 const { groupByKey } = require('./utils');
+const t = require('../../i18n');
 
 const version = packageInfo.version;
 
@@ -209,23 +210,22 @@ module.exports = class CLI {
     process.stdout.write(ansiEscapes.eraseDown);
 
     if (options.command) {
-      process.stdout.write(red(`${os.EOL}x ${options.command} 失败 `));
+      process.stdout.write(red(t('{{attr0}}x {{attr1}} 失败 ', { attr0: os.EOL, attr1: options.command })));
       process.stdout.write(grey(`(${options.timer || this._.timerSeconds || 0}s)${os.EOL}`));
     }
 
     // Add space
     console.log('');
 
-    let basicInfo = `帮助文档:    https://cloud.tencent.com/document/product/1154/38790
-BUG提交:     https://github.com/Serverlesstencent/serverless-cloud-framework/issues
-问答社区:    https://github.com/Serverlesstencent/serverless-cloud-framework/discussions`;
+    let basicInfo = `${t('帮助文档')}:    https://cloud.tencent.com/document/product/1154/38790
+${t('BUG提交')}:     https://github.com/Serverlesstencent/serverless-cloud-framework/issues
+${t('问答社区')}:    https://github.com/Serverlesstencent/serverless-cloud-framework/discussions`;
 
     const extraErrorInfo = error.extraErrorInfo || {};
 
     const referral = error.referral || extraErrorInfo.referral;
     if (referral) {
-      basicInfo = `参考信息:    ${referral}
-${basicInfo}`;
+      basicInfo = `${t('参考信息')}:    ${referral}${basicInfo}`;
     }
 
     // Write to terminal
@@ -237,13 +237,13 @@ ${basicInfo}`;
 ${red('Error:')}
 `;
 
-    const pureStep = new Set(['无效的Serverless应用']);
+    const pureStep = new Set([t('无效的Serverless应用')]);
     let extraMessage = '';
     const step = error.step || extraErrorInfo.step;
     const source = error.source || extraErrorInfo.source;
 
     if (step) {
-      extraMessage += `${pureStep.has(step) ? step : `${step}失败`}`;
+      extraMessage += `${pureStep.has(step) ? step : t('{{step}}失败', { step })}`;
     }
     if (source) {
       extraMessage += `(${grey(source)})`;
@@ -254,7 +254,7 @@ ${red('Error:')}
 `;
     }
     // remove [requestId, traceId] from error message
-    errorMessage += `错误信息: ${error.message.replace(/\[(.*?)\]/g, '')}`;
+    errorMessage += t('错误信息: {{attr0}}', { attr0: error.message.replace(/\[(.*?)\]/g, '') });
 
     process.stdout.write(errorMessage);
 
@@ -326,7 +326,7 @@ TraceId:     ${traceId}`;
     process.stdout.write(ansiEscapes.eraseDown);
     console.log();
     console.log(
-      `${component} 组件校验结果: 错误 ${errors.length} 警告 ${warnings.length} 规则版本 v${typeVersion} `
+      t('{{component}} 组件校验结果: 错误 {{attr0}} 警告 {{attr1}} 规则版本 v{{typeVersion}} ', { component, attr0: errors.length, attr1: warnings.length, typeVersion })
     );
     console.log('---------------------------------------------');
     if (msgsByPath.message) {
@@ -341,7 +341,7 @@ TraceId:     ${traceId}`;
         console.log(`  * ${key} `);
         msgsByPath[key]
           .sort((a) => {
-            if (a.message && a.message.includes('类型错误')) return -1;
+            if (a.message && a.message.includes(t('类型错误'))) return -1;
             return 0;
           })
           .forEach((msg) => {
@@ -353,7 +353,7 @@ TraceId:     ${traceId}`;
           });
       });
     console.log();
-    console.log(chalk.gray('可以使用 --noValidation 跳过 serverless 应用配置校验'));
+    console.log(chalk.gray(t('可以使用 --noValidation 跳过 serverless 应用配置校验')));
     if (errors.length > 0) {
       process.exit(1);
     }

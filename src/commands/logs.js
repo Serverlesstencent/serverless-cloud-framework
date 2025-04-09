@@ -14,6 +14,7 @@ const relativeTime = require('dayjs/plugin/relativeTime');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const { v4: uuidv4 } = require('uuid');
+const t = require('../../i18n');
 
 dayjs.extend(utc);
 dayjs.extend(timezone); // dependent on utc plugin
@@ -43,7 +44,7 @@ module.exports = async (config, cli, command) => {
     r,
     startTime,
     tail,
-    t,
+    t: _t,
     interval,
     i,
     function: originalFunctionAlias,
@@ -69,7 +70,7 @@ module.exports = async (config, cli, command) => {
         .tz('Asia/Shanghai')
         .format('YYYY-MM-DD HH:mm:ss');
     } else if (!dayjs(startTime).isValid()) {
-      cli.log(`Serverless: ${chalk.yellow('指定时间格式不正确，请检查后重试')}`);
+      cli.log(`Serverless: ${chalk.yellow(t('指定时间格式不正确，请检查后重试'))}`);
       process.exit(1);
     } else {
       startTimeValue = dayjs(startTime).tz('Asia/Shanghai').format('YYYY-MM-DD HH:mm:ss');
@@ -88,7 +89,7 @@ module.exports = async (config, cli, command) => {
   }
   if (utils.runningTemplate(instanceDir)) {
     cli.log(
-      `Serverless: ${chalk.yellow('该命令暂不支持对多组件进行调用，请使用 --target 指定组件实例')}`
+      `Serverless: ${chalk.yellow(t('该命令暂不支持对多组件进行调用，请使用 --target 指定组件实例'))}`
     );
     process.exit(1);
   }
@@ -137,27 +138,27 @@ module.exports = async (config, cli, command) => {
     } catch (error) {
       if (!error.extraErrorInfo) {
         error.extraErrorInfo = {
-          step: '日志获取',
+          step: t('日志获取'),
         };
       } else {
-        error.extraErrorInfo.step = '日志获取';
+        error.extraErrorInfo.step = t('日志获取');
       }
       throw error;
     }
   }
 
   try {
-    if (!tail && !t) {
-      cli.sessionStart('正在获取日志');
+    if (!tail && !_t) {
+      cli.sessionStart(t('正在获取日志'));
       const res = await getLogList();
       if (res.length > 0) {
         printLogMessages(res, cli);
       } else {
-        cli.log(chalk.gray('当前时间范围内没有可用的日志信息'));
+        cli.log(chalk.gray(t('当前时间范围内没有可用的日志信息')));
       }
-      cli.sessionStop('success', '获取日志成功');
+      cli.sessionStop('success', t('获取日志成功'));
     } else {
-      cli.sessionStart('监听中');
+      cli.sessionStart(t('监听中'));
 
       // Polling logs
       let errorCount = 0;

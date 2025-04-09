@@ -23,6 +23,7 @@ const YAML = require('js-yaml');
 const fse = require('fs-extra');
 const inquirer = require('@serverless/utils/inquirer');
 const { USER_PERFERENCE_FILE } = require('./constants');
+const t = require('../../../i18n');
 
 const updateEnvFile = (envs) => {
   // write env file
@@ -62,29 +63,29 @@ const checkBasicConfigValidation = async (dicPath) => {
     const instanceFile = loadInstanceConfig(dicPath);
 
     if (!fse.existsSync(dicPath)) {
-      console.log(`Serverless:${chalk.yellow(`指定的路径 ${dicPath} 不存在，请检查后重试`)}`);
+      console.log(`Serverless:${chalk.yellow(t('指定的路径 {{dicPath}} 不存在，请检查后重试', { dicPath }))}`);
       process.exit(1);
     }
 
     if (!instanceFile) {
       const newError = new Error(
-        '无法部署当前目录，请检查目录或添加 serverless.yml 应用配置文件后重试。'
+        t('无法部署当前目录，请检查目录或添加 serverless.yml 应用配置文件后重试。')
       );
       newError.referral = 'https://cloud.tencent.com/document/product/1154/38787';
       throw newError;
     }
 
     if (!instanceFile.name) {
-      throw new Error('在serverless配置文件中没有发现实例名称("name"字段)，请检查。');
+      throw new Error(t('在serverless配置文件中没有发现实例名称("name"字段)，请检查。'));
     }
 
     if (!instanceFile.component) {
-      throw new Error('在serverless配置文件中没有发现组件类型("component"字段)，请检查。');
+      throw new Error(t('在serverless配置文件中没有发现组件类型("component"字段)，请检查。'));
     }
     return instanceFile;
   } catch (e) {
     e.extraErrorInfo = {
-      step: '无效的Serverless应用',
+      step: t('无效的Serverless应用'),
       source: 'Serverless::CLI',
     };
     throw e;
@@ -169,7 +170,7 @@ const loadTencentInstanceConfig = async (directoryPath, command) => {
 const login = async (config = {}) => {
   if (config.useTencentCredential) {
     process.stdout.write(
-      `使用授权信息 ${config.useTencentCredential} 授权中，如果需要使用临时密钥，请使用 --login 重新登录\n`
+      t('使用授权信息 {{attr0}} 授权中，如果需要使用临时密钥，请使用 --login 重新登录\n', { attr0: config.useTencentCredential })
     );
   }
 
@@ -187,7 +188,7 @@ const login = async (config = {}) => {
   } catch (e) /* istanbul ignore next */ {
     e.extraErrorInfo = {
       source: 'Tencent::Auth',
-      step: '授权登录',
+      step: t('授权登录'),
       referral: 'https://cloud.tencent.com/document/product/598/33168',
     };
     throw e;
@@ -267,14 +268,14 @@ const getDirForInvokeCommand = async (root, functionAlias) => {
   const multiScfInstances = instances.filter((instance) => instance.component === 'multi-scf');
   const scfInstances = instances.filter((instance) => instance.component === 'scf');
   if (scfInstances.length + multiScfInstances.length === 0) {
-    throw new Error('没有找到可执行的函数目录，请使用 --target 指定或检查后再试');
+    throw new Error(t('没有找到可执行的函数目录，请使用 --target 指定或检查后再试'));
   } else if (scfInstances.length === 1 && multiScfInstances.length === 0) {
     instanceDir = scfInstances[0].directoryPath;
   } else if (scfInstances.length === 0 && multiScfInstances.length === 1) {
     instanceDir = multiScfInstances[0].directoryPath;
   } else if (scfInstances.length === 0 && multiScfInstances.length > 1) {
     if (!functionAlias) {
-      throw new Error('请使用 --function / -f 指定要调用的函数');
+      throw new Error(t('请使用 --function / -f 指定要调用的函数'));
     }
     const instanceDirs = multiScfInstances.filter((instance) =>
       instance.functions.includes(functionAlias)
@@ -282,12 +283,12 @@ const getDirForInvokeCommand = async (root, functionAlias) => {
     if (instanceDirs.length === 1) {
       instanceDir = instanceDirs[0].directoryPath;
     } else if (instanceDirs.length === 0) {
-      throw new Error('未找到指定函数，请检查后重试');
+      throw new Error(t('未找到指定函数，请检查后重试'));
     } else {
-      throw new Error('发现同名函数，请通过 --target 指定要调用函数的目录');
+      throw new Error(t('发现同名函数，请通过 --target 指定要调用函数的目录'));
     }
   } else {
-    throw new Error('目录中存在多个 SCF 组件，请使用 --target 指定目录或检查后再试');
+    throw new Error(t('目录中存在多个 SCF 组件，请使用 --target 指定目录或检查后再试'));
   }
   return instanceDir;
 };
@@ -493,7 +494,7 @@ inputs:
 
   if (!packageObj.dependencies) {
     const newError = new Error(
-      '无法部署当前目录，请检查目录或添加 serverless.yml 应用配置文件后重试。'
+      t('无法部署当前目录，请检查目录或添加 serverless.yml 应用配置文件后重试。')
     );
     newError.referral = 'https://cloud.tencent.com/document/product/1154/38787';
     throw newError;
@@ -504,7 +505,7 @@ inputs:
 
   if (knownPackages.length === 0) {
     const newError = new Error(
-      '无法部署当前目录，请检查目录或添加 serverless.yml 应用配置文件后重试。'
+      t('无法部署当前目录，请检查目录或添加 serverless.yml 应用配置文件后重试。')
     );
     newError.referral = 'https://cloud.tencent.com/document/product/1154/38787';
     throw newError;
@@ -516,7 +517,7 @@ inputs:
     ymlType = knownPackages[0];
   } else if (knownPackages.length > 1) {
     const result = await inquirer.prompt({
-      message: '在 package.json 里发现以下依赖，选择您希望创建的 serverless 的应用类型',
+      message: t('在 package.json 里发现以下依赖，选择您希望创建的 serverless 的应用类型'),
       type: 'list',
       name: 'ymlType',
       choices: knownPackages,
@@ -529,7 +530,7 @@ inputs:
     const hasSlsJs = await fileExists(entryFilePath);
     if (!hasSlsJs) {
       const res = await inquirer.prompt({
-        message: '未发现 app.js，请输入入口文件名称',
+        message: t('未发现 app.js，请输入入口文件名称'),
         type: 'input',
         name: 'entryFile',
       });
@@ -539,7 +540,7 @@ inputs:
     const hasEntryFile = await fileExists(entryFilePath);
 
     if (!hasEntryFile) {
-      throw new Error('未找到入口文件，请重试');
+      throw new Error(t('未找到入口文件，请重试'));
     }
 
     const entryFileRelativePath = path.relative(process.cwd(), entryFilePath);
@@ -576,9 +577,6 @@ const writeClientUid = async (p = clientUidDefaultPath, options = {}) => {
       writeJsonToCredentials(p, {
         client_uid: res,
       });
-      const { sendToMetrics } = require('../telemtry/index');
-
-      await sendToMetrics(res, {}, { initClientUid: true });
     } else {
       res = loadCredentialsToJson(p).client_uid;
     }
@@ -622,4 +620,5 @@ module.exports = {
   loadTencentInstanceConfig,
   ServerlessCLIError,
   writePerference,
+  updateEnvFile
 };

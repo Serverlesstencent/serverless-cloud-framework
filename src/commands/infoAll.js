@@ -6,6 +6,7 @@ const { getTemplate, getInstanceDashboardUrl } = require('../libs/utils');
 const chalk = require('chalk');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
+const t = require('../../i18n');
 
 dayjs.extend(relativeTime);
 
@@ -46,9 +47,9 @@ module.exports = async (config, cli) => {
       instance = result.instance;
     } catch (e) {
       if (!e.extraErrorInfo) {
-        e.extraErrorInfo = { step: '实例信息获取' };
+        e.extraErrorInfo = { step: t('实例信息获取') };
       } else {
-        e.extraErrorInfo.step = '实例信息获取';
+        e.extraErrorInfo.step = t('实例信息获取');
       }
       throw e;
     }
@@ -71,9 +72,9 @@ module.exports = async (config, cli) => {
     } else {
       statusLog = instance.instanceStatus;
     }
-    cli.log(`  ${chalk.grey('最后操作:')}  ${instance.lastAction} (${lastActionAgo})`);
-    cli.log(`  ${chalk.grey('部署次数:')}  ${statusLog}`);
-    cli.log(`  ${chalk.grey('应用状态:')}  ${instance.instanceMetrics.deployments}`);
+    cli.log(`  ${chalk.grey(t('最后操作:'))}  ${instance.lastAction} (${lastActionAgo})`);
+    cli.log(`  ${chalk.grey(t('部署次数:'))}  ${statusLog}`);
+    cli.log(`  ${chalk.grey(t('应用状态:'))}  ${instance.instanceMetrics.deployments}`);
 
     // show state only in debug mode
     if (config.debug) {
@@ -87,7 +88,7 @@ module.exports = async (config, cli) => {
 
     delete outputs.vendorMessage;
 
-    cli.log(`  ${chalk.grey('输出:')}`);
+    cli.log(`  ${chalk.grey(t('输出:'))}`);
     cli.logOutputs(outputs, 4);
 
     cli.log();
@@ -95,5 +96,5 @@ module.exports = async (config, cli) => {
 
   cli.log(getInstanceDashboardUrl(templateYaml));
 
-  cli.sessionStop('success', '信息成功加载');
+  cli.sessionStop('success', t('信息成功加载'));
 };

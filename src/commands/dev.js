@@ -14,6 +14,8 @@ const { standaloneUpgrade } = require('../libs/standalone');
 const { v4: uuidv4 } = require('uuid');
 const utils = require('../libs/utils');
 const chalk = require('chalk');
+const t = require('../../i18n');
+const { name: cliName } = require('../../package.json');
 
 class LogForwardingOutput extends Writable {
   _write(chunk, encoding, callback) {
@@ -74,15 +76,16 @@ async function deploy(sdk, instance, credentials) {
     }
   }
   let instanceInfo = {};
-
+  const options = {};
+  options.cliName = cliName;
   try {
-    await sdk.deploy(instance, credentials);
+    await sdk.deploy(instance, credentials,options);
     const instanceStatusPollingStartTime = new Date().getTime();
     instanceInfo = await getInstanceInfo(sdk, instance);
     while (instanceInfo.instanceStatus === 'deploying') {
       instanceInfo = await getInstanceInfo(sdk, instance);
       if (Date.now() - instanceStatusPollingStartTime > 24000) {
-        throw new Error('部署超时，请稍后重试');
+        throw new Error(t('部署超时，请稍后重试'));
       }
     }
   } catch (e) {
@@ -148,16 +151,16 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
       cli.log(header, 'grey');
       delete instanceInfo.outputs.vendorMessage;
       cli.logOutputs(instanceInfo.outputs);
-      cli.sessionStatus('监听中');
+      cli.sessionStatus(t('监听中'));
       return true;
     }
     case 'error':
       cli.log(`${header} error`, 'grey');
       cli.log(deploymentErrorStack || deploymentError, 'red');
-      cli.sessionStatus('监听中');
+      cli.sessionStatus(t('监听中'));
       break;
     default:
-      cli.log(`部署失败，当前实例状态不支持更改: ${instanceStatus}`, 'red');
+      cli.log(t('部署失败，当前实例状态不支持更改: {{instanceStatus}}', { instanceStatus }), 'red');
   }
   return false;
 }
@@ -171,7 +174,7 @@ module.exports = async (config, cli, command) => {
   }
   if (utils.runningTemplate(instanceDir)) {
     cli.log(
-      `Serverless: ${chalk.yellow('该命令暂不支持对多组件进行调用, 使用 --target 指定执行目录')}`
+      `Serverless: ${chalk.yellow(t('该命令暂不支持对多组件进行调用, 使用 --target 指定执行目录'))}`
     );
     process.exit(1);
   }
@@ -183,13 +186,13 @@ module.exports = async (config, cli, command) => {
     projectFile.inputs.runtime &&
     projectFile.inputs.runtime.toLowerCase().startsWith('nodejs')
   ) {
-    cli.log('为方便您的调试，当前开启调试模式后，应用实例配置将会变更:');
+    cli.log(t('为方便您的调试，当前开启调试模式后，应用实例配置将会变更:'));
     cli.log(
-      '1. 当前函数实例将进入单例模式；同一时间该函数所有版本只能响应一个事件，并发超出的事件将调用失败；已预制的多个实例也会缩至单个实例'
+      t('1. 当前函数实例将进入单例模式；同一时间该函数所有版本只能响应一个事件，并发超出的事件将调用失败；已预制的多个实例也会缩至单个实例')
     );
-    cli.log('2. $LATEST版本执行超时时间将调整为900s');
-    cli.log('3. 关闭调试模式后，上述配置将恢复');
-    cli.log('以上变更只针对Node.js且版本>=10.15, 其它语言或版本不受影响');
+    cli.log(t('2. $LATEST版本执行超时时间将调整为900s'));
+    cli.log(t('3. 关闭调试模式后，上述配置将恢复'));
+    cli.log(t('以上变更只针对Node.js且版本>=10.15, 其它语言或版本不受影响'));
   }
 
   let watcher;
@@ -199,7 +202,7 @@ module.exports = async (config, cli, command) => {
       cli.logError(
         {
           message: msg,
-          step: '远程开发监听',
+          step: t('远程开发监听'),
           source: 'Tencent::Scf',
         },
         { command: 'dev' }
@@ -216,21 +219,21 @@ module.exports = async (config, cli, command) => {
   const closeHandler = async () => {
     // Set new close listener
     process.on('SIGINT', () => {
-      cli.sessionStop('error', 'dev 模式已取消');
+      cli.sessionStop('error', t('dev 模式已取消'));
       process.exit();
     });
 
     if (watcher) {
       await watcher.close();
     }
-    cli.sessionStatus('dev 模式关闭中', null, 'green');
+    cli.sessionStatus(t('dev 模式关闭中'), null, 'green');
     const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
     if (await updateDeploymentStatus(cli, deployedInstance, false)) {
-      cli.sessionStop('success', 'dev 模式已关闭');
+      cli.sessionStop('success', t('dev 模式已关闭'));
       await standaloneUpgrade(config);
       return null;
     }
-    cli.sessionStop('error', '部署失败，请运行 “scf deploy” 进行重试');
+    cli.sessionStop('error', t('部署失败，请运行 “scf deploy” 进行重试'));
     await standaloneUpgrade(config);
     return null;
   };
@@ -242,7 +245,7 @@ module.exports = async (config, cli, command) => {
 
   // Presentation
   cli.logLogo();
-  cli.log('Dev Mode - 项目监控中，任何变更都会通过日志输出', 'grey');
+  cli.log(t('Dev Mode - 项目监控中，任何变更都会通过日志输出'), 'grey');
   cli.log();
 
   let instanceYaml = await utils.loadTencentInstanceConfig(instanceDir, command);
@@ -293,7 +296,7 @@ module.exports = async (config, cli, command) => {
     watcher = chokidar.watch(process.cwd(), { ignored: /\.serverless/ });
 
     watcher.on('ready', async () => {
-      cli.sessionStatus('dev 模式开启中', null, 'green');
+      cli.sessionStatus(t('dev 模式开启中'), null, 'green');
       // Try to stop debug mode before first time deploy
       const instanceInfo = await getInstanceInfo(sdk, instanceYaml);
       if (
@@ -375,10 +378,10 @@ module.exports = async (config, cli, command) => {
     });
   } catch (e) {
     if (e.extraErrorInfo) {
-      e.extraErrorInfo.step = '启动远程开发';
+      e.extraErrorInfo.step = t('启动远程开发');
     } else {
       e.extraErrorInfo = {
-        step: '启动远程开发',
+        step: t('启动远程开发'),
       };
     }
     telemtryData.outcome = 'failure';

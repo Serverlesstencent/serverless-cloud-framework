@@ -10,20 +10,21 @@ const { v4: uuidv4 } = require('uuid');
 // const requestNotification = require('../libs/notifications/request');
 const printNotification = require('../libs/notifications/print-notification');
 const { name: cliName } = require('../../package.json');
+const t = require('../../i18n');
 
 function translateCommand(command) {
   const translateCommandMap = new Map([
-    ['deploy', '部署'],
-    ['remove', '移除'],
+    ['deploy', t('部署')],
+    ['remove', t('移除')],
   ]);
   if (translateCommandMap.has(command)) {
     return translateCommandMap.get(command);
   }
-  return '执行';
+  return t('执行');
 }
 
 module.exports = async (config, cli, command) => {
-  cli.sessionStart('正在初始化', { timer: true });
+  cli.sessionStart(t('正在初始化'), { timer: true });
 
   // No dynamic value, default is false
   config.debug = false;
@@ -33,19 +34,19 @@ module.exports = async (config, cli, command) => {
   if (!config.debug) {
     cli.logLogo();
   } else if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-    cli.log('正在dev环境执行命令');
+    cli.log(t('正在dev环境执行命令'));
   }
 
   const templateYaml = await utils.getTemplate(process.cwd());
 
   if (!templateYaml) {
-    throw new Error('在子文件夹中没有发现组件信息');
+    throw new Error(t('在子文件夹中没有发现组件信息'));
   }
 
   // Load Instance Credentials
   const credentials = await utils.loadInstanceCredentials(templateYaml.stage);
 
-  cli.sessionStatus('正在初始化', templateYaml.name);
+  cli.sessionStatus(t('正在初始化'), templateYaml.name);
 
   // initialize SDK
   const orgUid = await tencentUtils.getOrgId();
@@ -75,29 +76,12 @@ module.exports = async (config, cli, command) => {
     options.client_uid = cliendUidResult.value;
   }
 
-  if (options.debug) {
-    await sdk.connect({
-      filter: {
-        stageName: templateYaml.stage,
-        appName: templateYaml.app,
-      },
-      onEvent: utils.handleDebugLogMessage(cli),
-    });
-  }
-
   const deferredNotificationsData = null;
-    // command === 'deploy'
-    //   ? requestNotification(
-    //       Object.assign(generateNotificationsPayload(templateYaml), {
-    //         command: 'deploy',
-    //       })
-    //     )
-    //   : null;
 
   if (command === 'remove') {
-    cli.sessionStatus('正在删除', null, 'white');
+    cli.sessionStatus(t('正在删除'), null, 'white');
   } else {
-    cli.sessionStatus('正在部署', null, 'white');
+    cli.sessionStatus(t('正在部署'), null, 'white');
   }
 
   const allComponents = await utils.getAllComponents(templateYaml);
@@ -147,7 +131,7 @@ module.exports = async (config, cli, command) => {
     if (failed.length) {
       cli.sessionStop(
         'error',
-        `已成功 ${translateCommand(command)}组件${succeeded.length}个，失败${failed.length}个`
+        t('已成功 {{attr0}}组件{{attr1}}个，失败{{attr2}}个', { attr0: translateCommand(command), attr1: succeeded.length, attr2: failed.length })
       );
       telemtryData.outcome = 'failure';
       telemtryData.failure_reason = failed.map((f) => f.error.message).join(',');
@@ -171,7 +155,7 @@ module.exports = async (config, cli, command) => {
       }
     }
 
-    cli.sessionStop('success', `已成功${translateCommand(command)}组件${succeeded.length}个`);
+    cli.sessionStop('success', t('已成功{{attr0}}组件{{attr1}}个', { attr0: translateCommand(command), attr1: succeeded.length }));
 
     if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
     await storeLocally(telemtryData);
