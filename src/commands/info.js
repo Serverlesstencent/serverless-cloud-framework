@@ -5,7 +5,7 @@
  */
 
 const path = require('path');
-const { ServerlessSDK } = require('@serverless-cloud-framework/platform-client-china');
+const { ServerlessSDK, utils: chinaUtils  } = require('@serverless-cloud-framework/platform-client-china');
 const { v4: uuidv4 } = require('uuid');
 const utils = require('../libs/utils');
 const infoAll = require('./infoAll');
@@ -13,6 +13,8 @@ const chalk = require('chalk');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
 const t = require('../../i18n');
+const {computeDuration,reportLogger} = require('../libs/reports/index')
+const { LogLevel } = require('../libs/reports/constants');
 
 dayjs.extend(relativeTime);
 
@@ -37,7 +39,9 @@ module.exports = async (config, cli, command) => {
   // Presentation
   cli.logLogo();
   cli.log();
-
+  //初始化开始时间值
+  let startTime = new Date().getTime()
+  let userInfo = {}
   cli.sessionStatus('Initializing', instanceYaml.name);
 
   // initialize SDK
@@ -51,6 +55,10 @@ module.exports = async (config, cli, command) => {
   // Fetch info
   let instance = {};
   try {
+    //查询用户信息
+    userInfo = await chinaUtils.getUserInfo();
+
+    // 查询应用信息
     instance = await sdk.getInstance(
       instanceYaml.org,
       instanceYaml.stage,
@@ -58,7 +66,31 @@ module.exports = async (config, cli, command) => {
       instanceYaml.name,
       { fetchSourceCodeUrl: true }
     );
+    // 上报部署成功日志
+    reportLogger({
+      logMessage: `${command} success`,
+      cliCommand: command ,
+      cliDuration: computeDuration(startTime),
+      appId: process.env.TENCENT_APP_ID,
+      uin: userInfo.uin,
+      cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+      cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+      instanceYaml
+      },LogLevel.Info
+    )
   } catch (e) {
+    // 上报失败日志
+    reportLogger({
+      logMessage: `${command} failed:${e.message || ''}`,
+      cliCommand: command ,
+      cliDuration: computeDuration(startTime),
+      appId: process.env.TENCENT_APP_ID,
+      uin: userInfo.uin,
+      cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+      cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+      instanceYaml
+      },LogLevel.Error
+    )
     if (!e.extraErrorInfo) {
       e.extraErrorInfo = { step: t('实例信息获取') };
     } else {

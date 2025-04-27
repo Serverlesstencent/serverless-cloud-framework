@@ -13,6 +13,9 @@ const { generatePayload, storeLocally } = require('../../libs/telemtry');
 const chalk = require('chalk');
 const { inspect } = require('util');
 const { v4: uuidv4 } = require('uuid');
+const { name: cliName } = require('../../../package.json');
+const {computeDuration,reportLogger} = require('../../libs/reports/index')
+const { LogLevel } = require('../../libs/reports/constants');
 
 /**
  * --stage / -s Set stage
@@ -66,6 +69,10 @@ module.exports = async (config, cli, command) => {
 
   await utils.checkBasicConfigValidation(instanceDir);
 
+  //初始化开始时间值
+  let startTime = new Date().getTime()
+  let orgUid = ''
+  let userInfo = {}
   const subCommand = config.params[0];
 
   if (subCommand === 'local') {
@@ -118,7 +125,8 @@ module.exports = async (config, cli, command) => {
 
     const componentType = instanceYaml && instanceYaml.component;
 
-    const orgUid = await chinaUtils.getOrgId();
+    userInfo = await chinaUtils.getUserInfo();
+    orgUid = userInfo.appId || ''
     telemtryData.user_uid = orgUid;
 
     if (!componentType.startsWith('scf') && !componentType.startsWith('multi-scf')) {
@@ -147,6 +155,7 @@ module.exports = async (config, cli, command) => {
       event: JSON.parse(dataValue || '{}'),
       namespace: namespaceValue,
       qualifier: qualifierValue,
+      cliName
     };
     let res;
     try {
@@ -157,6 +166,7 @@ module.exports = async (config, cli, command) => {
         instanceYaml.name,
         options
       );
+      
     } catch (e) {
       if (!e.extraErrorInfo) {
         e.extraErrorInfo = {
@@ -170,6 +180,18 @@ module.exports = async (config, cli, command) => {
     }
 
     if (res.retMsg) {
+      // 上报成功日志
+      reportLogger({
+        logMessage:`${command} success`,
+        cliCommand:command ,
+        cliDuration: computeDuration(startTime),
+        appId: orgUid,
+        uin: userInfo.uin,
+        cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+        cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+        instanceYaml,
+        },LogLevel.Info
+      )
       const retMsg = res.retMsg;
       delete res.retMsg;
       cli.logOutputs(res);
@@ -192,6 +214,19 @@ module.exports = async (config, cli, command) => {
     });
     return 0;
   } catch (e) {
+    // 上报失败日志
+    reportLogger({
+      logMessage:`${command} failed:${e.message || ''}`,
+      cliCommand:command ,
+      cliDuration: computeDuration(startTime),
+      appId: orgUid,
+      uin: userInfo.uin,
+      cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+      cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+      instanceYaml,
+      error: e.message || ''
+      },LogLevel.Error
+    )
     telemtryData.outcome = 'failure';
     telemtryData.failure_reason = e.message;
     await storeLocally(telemtryData, e);

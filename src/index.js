@@ -7,6 +7,7 @@ const { checkVersion } = require('./libs/cliUpdater');
 const { standaloneUpgrade } = require('./libs/standalone');
 const { isProjectPath, loadTencentGlobalConfig, ServerlessCLIError } = require('./libs/utils');
 const t = require('../i18n');
+const { initGalileoLogger } = require('./libs/reports/index')
 
 module.exports = async () => {
   const config = buildConfig();
@@ -33,6 +34,9 @@ module.exports = async () => {
         t('检测到当前目录下已有 serverless 项目，请通过 "scf deploy" 进行部署，或在新路径下完成 serverless 项目初始化')
       );
     }
+
+    // 初始化伽利略日志上报实例
+    initGalileoLogger()
 
     if (commands[command]) {
       await commands[command](config, cli, command);
