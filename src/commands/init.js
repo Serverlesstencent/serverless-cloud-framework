@@ -17,6 +17,8 @@ const { ServerlessSDK } = require('@serverless-cloud-framework/platform-client-c
 const spawn = require('child-process-ext/spawn');
 const { parseYaml, saveYaml, ServerlessCLIError } = require('../libs/utils');
 const t = require('../../i18n');
+const {computeDuration,reportLogger} = require('../libs/reports/index')
+const { LogLevel } = require('../libs/reports/constants');
 
 const pipeline = promisify(stream.pipeline);
 
@@ -130,8 +132,10 @@ const init = async (config, cli) => {
   cli.log();
 
   let packageName = config.t || config.template;
+  let command = 'init'
   let telemtryData = await generatePayload({ command: 'init' });
-
+  //初始化开始时间值
+  const startTime = new Date().getTime()
   try {
     if (!packageName) {
       if (config.params && config.params.length > 0) {
@@ -145,6 +149,13 @@ const init = async (config, cli) => {
     let registryPackage;
     try {
       registryPackage = await sdk.getPackage(packageName);
+      // 上报成功日志
+      reportLogger({
+        logMessage:`${command} ${packageName} success`,
+        cliCommand: command ,
+        cliDuration: computeDuration(startTime),
+        },LogLevel.Info
+      )
     } catch (e) {
       if (!e.extraErrorInfo) {
         e.extraErrorInfo = {
@@ -224,6 +235,16 @@ const init = async (config, cli) => {
     cli.sessionStop('success', t('创建成功'));
     return null;
   } catch (err) {
+    // 上报命令执行错误日志
+    if (err && err.message) {
+      reportLogger(
+        { 
+          logMessage: `${command} ${packageName} failed: ${err.message}`,
+          cliCommand: command,
+          cliDuration: computeDuration(startTime),
+        },LogLevel.Error
+      )
+    }
     telemtryData.outcome = 'failure';
     telemtryData.failure_reason = err.message;
     await storeLocally(telemtryData, err);

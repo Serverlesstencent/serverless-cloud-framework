@@ -9,7 +9,6 @@ const ACTION_TYPE_ENUM = {
   UPGRADE :  'upgrade',
   ROLLBACK: 'rollback'
 }
-
 module.exports = {
   USER_PERFERENCE_FILE,
   ACTION_TYPE_ENUM

@@ -30,7 +30,6 @@ const defaultPath = getDefaultCredentialsPath();
 
 module.exports = async (config, cli, command, globalTencentCredentials = defaultPath) => {
   const subCommand = config.params[0];
-
   if (subCommand === 'set') {
     try {
       const { i, k, n, overwrite, o } = config;
@@ -92,7 +91,6 @@ module.exports = async (config, cli, command, globalTencentCredentials = default
         );
         cli.log(`Serverless: ${chalk.green(t('授权信息 {{profile}} 储存成功', {profile}))}`);
       }
-
       writeJsonToCredentials(globalTencentCredentials, credContent);
     } catch (e) {
       throw new ServerlessCLIError(e.message, { step: t('授权信息存储') });

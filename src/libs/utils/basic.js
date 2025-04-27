@@ -874,6 +874,38 @@ const groupByKey = (array, key) => {
   }, {});
 };
 
+/**
+ * 查询地域信息（yaml文件配置地域）
+ * @param {*} yaml 
+ * @returns region 返回值如ap-guangzhou
+ */
+const getRegionFromYaml = (yaml) => {
+  if (!yaml || !yaml.inputs || !yaml.inputs.region) {
+    return ''
+  }
+  const region = yaml.inputs.region
+  return region
+}
+
+/**
+ * 查询函数名称（yaml文件配置函数名）
+ * @param {*} yaml 
+ * @returns 
+ */
+const getFuncNameFromYaml = (yaml) => {
+  // 目前仅SCF组件需要上报functionName
+  if (!yaml || !yaml.name  || !yaml.app || !yaml.component || !['scf','scf@dev'].includes(yaml.component)) {
+    return ''
+  }
+  let name = ''
+  if (yaml.inputs && yaml.inputs.name) {
+    name = yaml.inputs.name
+  } else {
+    name = `${yaml.name}-${yaml.stage || 'dev'}-${yaml.app}`
+  }
+  return name
+}
+
 module.exports = {
   fileExists,
   fileExistsSync,
@@ -902,4 +934,6 @@ module.exports = {
   writeJsonToCredentials,
   groupByKey,
   getDefaultCredentialsPath,
+  getRegionFromYaml,
+  getFuncNameFromYaml,
 };
