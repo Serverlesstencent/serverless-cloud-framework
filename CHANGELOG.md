@@ -1,7 +1,13 @@
+# 1.4.0-beta.2 (2025-05-26)
+
+### Features
+
+
+
 # 1.4.0-beta.1 (2025-05-26)
 
 
-### Bug Fixes
+### Features
 
 * cli客户端放开700m code size limit 9ae16d1
 * env获取默认lang逻辑修复 c109d9c
