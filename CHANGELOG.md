@@ -1,3 +1,24 @@
+# 1.4.0-beta.1 (2025-05-26)
+
+
+### Bug Fixes
+
+* cli客户端放开700m code size limit 9ae16d1
+* env获取默认lang逻辑修复 c109d9c
+* merge master分支最新的代码 5741fa2
+* publish命令支持--rollback回滚组件版本参数 9fe34fb
+
+
+### Features
+
+* apigw net offline 55e0693
+* cli本地持配置语言，默认英文 1dc26e2
+* i18n 6e4e0ef
+* i18n 词条调整 4d3800e
+* update platform-client-china b8cc474
+* 删除scf param参数 f839b54
+* 支持配置语言 885adc7
+
 # 1.3.0 (2025-04-09)
 
 
