@@ -38,13 +38,7 @@ ${title(t('函数组件命令'))}
 
 ${command('invoke')}           ${t('调用函数')}
 ${command('invoke local')}     ${t('本地调用函数')}`;
-  }
-
-  const paramCommands = `
-${title(t('参数配置'))}         ${t('在线文档')}: https://cn.serverless.com/framework/docs-commands-parameters
-
-${command('param set')}        ${t('在项目目录下配置动态参数')}
-${command('param list')}       ${t('在项目目录下展示已配置的动态参数')}`;
+}
 
   cli.log(
     `
@@ -71,7 +65,6 @@ ${command('registry')}         ${t('查看模版信息')}
 ${command('bind role')}        ${t('重新为当前用户分配使用 Serverless 所需权限')}
 ${command('lang')}             ${t('查看和管理语言配置')}
 ${scfCommands}
-${paramCommands}
   `
   );
 }
@@ -170,14 +163,6 @@ ${description(`    --function / -f          ${t('调用的多函数组件的函�
     --py                     ${t('指定要使用的本机中的Python版本，默认使用python. 如: --py python3 (此配置只对runtime是Python的配置有效)')}
     --php                    ${t('指定要使用的本机中的Php版本，默认使用php. 如: --php php7.2 (此配置只对runtime是Php的配置有效)')}
 `)}`,
-    'param set': `
-${command2(
-  'param set'
-)}               ${t('在项目中配置参数,支持多参数配置: scf param set key1=value1 key2=value2')}
-`,
-    'param list': `
-${command2('param list')}              ${t('在项目中获取并展示已配置的所有参数')}
-`,
     'lang': `
 ${command2('lang')}                  ${t('查看当前语言')}
 ${description(`    {language}          ${t('指定语言，en为英文，zh为中文')}

@@ -1,37 +1,25 @@
-# 1.3.0-beta.5 (2024-09-20)
+# 1.3.0 (2025-04-09)
 
 
 ### Features
 
-* update platform-client-china b8cc474
+* apigw net offline b7465d5
+* cli本地持配置语言，默认英文 c6c28af
+* 删除scf param参数 8045837
 
-# 1.3.0-beta.4 (2024-09-19)
+## 1.2.2 (2025-03-07)
 
 
 ### Bug Fixes
 
-* env获取默认lang逻辑修复 c109d9c
+* publish命令支持--rollback回滚组件版本参数 8b4e257
 
-# 1.3.0-beta.3 (2024-09-19)
-
-
-### Features
-
-* 支持配置语言 885adc7
-
-# 1.3.0-beta.2 (2024-09-19)
+## 1.2.1 (2025-01-18)
 
 
-### Features
+### Bug Fixes
 
-* i18n 词条调整 4d3800e
-
-# 1.3.0-beta.1 (2024-09-19)
-
-
-### Features
-
-* i18n 6e4e0ef
+* cli客户端放开700m code size limit 1e4f752
 
 # 1.2.0 (2024-06-27)
 
