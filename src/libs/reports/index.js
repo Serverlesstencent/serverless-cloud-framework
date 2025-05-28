@@ -2,7 +2,6 @@ const loggerConfig  = require('./config')
 const {LogLevel,SamplingRateConfig,Command_Excute_Status} = require('./constants')
 const {getRegionFromYaml,getFuncNameFromYaml,getUnixNanoTime} = require('../utils/index');
 const { version: cliVersion } = require('../../../package.json');
-// const  got = require('got');
 const  { Logger } = require('@tencent/galileo-node-sdk');
 const { sleep } = require('@serverless-cloud-framework/platform-client-china/src/utils');
 
@@ -117,7 +116,9 @@ const  reportLogger = async (logParams,level = LogLevel.Info) => {
                 // 延迟上报
                 await sleep(loggerConfig.reportDelayTime)
             }
-        } catch (error) {}
+        } catch (error) {
+            if (error && error.message) console.log(t('上报监控日志出错(可忽略):"{{message}}"',{message: error.message}))
+        }
     },0)
 }
 

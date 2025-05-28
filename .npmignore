@@ -6,3 +6,5 @@ src
 examples
 tests
 .code.yml
+webpack.config.js
+prettier.config.js
