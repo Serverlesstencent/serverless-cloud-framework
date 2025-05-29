@@ -268,5 +268,6 @@
   "k_13ly2yy": "Reference Information",
   "k_01q8g6m": "View and manage language settings",
   "k_1g9frvc": "View current language",
-  "k_0y9gvo0": "Specify language, en for English, zh for Chinese"
+  "k_0y9gvo0": "Specify language, en for English, zh for Chinese",
+  "k_1ujs4cq": "Report monitoring log error (can be ignored): \"{{message}}\""
 }

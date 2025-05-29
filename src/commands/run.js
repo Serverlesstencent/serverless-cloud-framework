@@ -15,14 +15,13 @@ const { generatePayload, storeLocally, send: sendTelemtry } = require('../libs/t
 const utils = require('../libs/utils');
 const runAll = require('./runAll');
 const chalk = require('chalk');
-// const generateNotificationsPayload = require('../libs/notifications/generate-payload');
-// const requestNotification = require('../libs/notifications/request');
 const printNotification = require('../libs/notifications/print-notification');
 const { name: cliName, version } = require('../../package.json');
 const { getServerlessFilePath } = require('../libs/serverlessFile');
 const confirm = require('@serverless/utils/inquirer/confirm');
 const t = require('../../i18n');
-
+const {computeDuration,reportLogger} = require('../libs/reports/index')
+const { LogLevel } = require('../libs/reports/constants');
 const componentsVersion = version;
 
 module.exports = async (config, cli, command) => {
@@ -43,6 +42,10 @@ module.exports = async (config, cli, command) => {
   }
 
   let telemtryData = await generatePayload({ command });
+  let instanceCredentials;
+  let instanceYaml;
+  let startTime;
+  let userInfo = {}
   try {
     const hasPackageJson = await utils.fileExists(path.join(process.cwd(), 'package.json'));
 
@@ -76,9 +79,12 @@ module.exports = async (config, cli, command) => {
     await utils.checkBasicConfigValidation(instanceDir);
 
     await utils.login(config);
+    
+    //初始化开始时间值
+    startTime = new Date().getTime()
 
     // Load YAML
-    const instanceYaml = await utils.loadTencentInstanceConfig(instanceDir, command);
+    instanceYaml = await utils.loadTencentInstanceConfig(instanceDir, command);
 
     // Presentation
     const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
@@ -92,10 +98,11 @@ module.exports = async (config, cli, command) => {
     cli.sessionStatus(t('正在初始化'), instanceYaml.name);
 
     // Load Instance Credentials
-    const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage);
+    instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage);
 
     // initialize SDK
-    const orgUid = await tencentUtils.getOrgId();
+    userInfo = await tencentUtils.getUserInfo();
+    const orgUid = userInfo.appId.toString()
     const sdk = new ServerlessSDK({
       accessKey: tencentUtils.buildTempAccessKeyForTencent({
         SecretId: process.env.TENCENT_SECRET_ID,
@@ -164,6 +171,30 @@ module.exports = async (config, cli, command) => {
       if (instance.typeErrors) {
         cli.logTypeError(instance.typeErrors);
         cli.log();
+        // 上报部署失败日志
+        reportLogger({
+          logMessage:`${command} failed: ${instance.deploymentError}`,
+          cliCommand: command ,
+          cliDuration: computeDuration(startTime), 
+          appId: orgUid,
+          uin: userInfo.uin,
+          cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+          cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+          instanceYaml
+        },LogLevel.Error)
+      }else {
+        // 上报部署成功日志
+        reportLogger({
+          logMessage: `${command} success`,
+          cliCommand: command ,
+          cliDuration: computeDuration(startTime), 
+          appId: orgUid,
+          uin: userInfo.uin,
+          cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+          cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+          instanceYaml,
+          },LogLevel.Info
+        )
       }
       cli.logOutputs(instance.outputs);
       cli.log();
@@ -208,7 +239,32 @@ module.exports = async (config, cli, command) => {
         cli.sessionStart(t('删除中'), { timer: true });
         cli.sessionStatus(t('删除中'), null, 'white');
         // run remove
-        await sdk.remove(instanceYaml, instanceCredentials, options);
+        let removeRes = await sdk.remove(instanceYaml, instanceCredentials, options);
+        // 上报remove操作日志
+        if (removeRes.error) {
+          reportLogger({
+            logMessage:`${command} failed: ${instance.deploymentError}`,
+            cliCommand:command ,
+            cliDuration: computeDuration(startTime),
+            appId: orgUid,
+            uin: userInfo.uin,
+            cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+            cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+            instanceYaml,
+            error: removeRes.error
+            },LogLevel.Error)
+        } else {
+          reportLogger({
+            logMessage:`${command} success`,
+            cliCommand:command ,
+            cliDuration: computeDuration(startTime),
+            appId: orgUid,
+            uin: userInfo.uin,
+            cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+            cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+            instanceYaml,
+          },LogLevel.Info)
+        }
       } else {
         cli.log();
         cli.log(t('已取消删除'));
@@ -224,6 +280,18 @@ module.exports = async (config, cli, command) => {
         }
       );
       cli.log(t('已成功开通 Serverless 相关权限'));
+      // 上报bind role操作成功日志
+      reportLogger({
+        logMessage:`${command} role success`,
+        cliCommand: command ,
+        cliDuration: computeDuration(startTime),
+        appId: orgUid,
+        uin: userInfo.uin,
+        cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+        cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+        instanceYaml,
+        },LogLevel.Info
+      )
     } else if (command === 'login') {
       // we have do login upside, so if command is login, do nothing here
       // no op
@@ -256,12 +324,29 @@ module.exports = async (config, cli, command) => {
     sdk.disconnect();
     return null;
   } catch (e) {
+    // 上报命令执行错误日志
+    if (e.message) {
+      reportLogger(
+        { 
+          logMessage: `${command} failed: ${e.message}`,
+          cliCommand:command,
+          cliDuration: computeDuration(startTime),
+          appId: userInfo.appId, 
+          uin: userInfo.uin,
+          cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+          cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+          instanceYaml,
+          error: e.message
+        },LogLevel.Error
+      )
+    }
     telemtryData.outcome = 'failure';
     telemtryData.failure_reason = e.message;
     await storeLocally(telemtryData, e);
     if (command === 'deploy') {
       await sendTelemtry();
     }
+
     throw e;
   }
 };

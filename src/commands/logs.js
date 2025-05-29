@@ -15,6 +15,9 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const { v4: uuidv4 } = require('uuid');
 const t = require('../../i18n');
+const {computeDuration,reportLogger} = require('../libs/reports/index')
+const { LogLevel } = require('../libs/reports/constants');
+
 
 dayjs.extend(utc);
 dayjs.extend(timezone); // dependent on utc plugin
@@ -96,8 +99,9 @@ module.exports = async (config, cli, command) => {
   await utils.checkBasicConfigValidation(instanceDir);
   await utils.login(config);
   const instanceYaml = await utils.loadTencentInstanceConfig(instanceDir, command);
-
-  const orgUid = await chinaUtils.getOrgId();
+  //初始化开始时间值
+  const reportLogStartTime = new Date().getTime()
+  const {appId:orgUid,uin} = await chinaUtils.getUserInfo(config.useTencentCredential);
   const telemtryData = await generatePayload({
     command,
     rootConfig: instanceYaml,
@@ -156,6 +160,18 @@ module.exports = async (config, cli, command) => {
       } else {
         cli.log(chalk.gray(t('当前时间范围内没有可用的日志信息')));
       }
+      // 上报成功日志
+      reportLogger({
+        logMessage:`${command} success`,
+        cliCommand: command ,
+        cliDuration: computeDuration(reportLogStartTime),
+        appId: orgUid,
+        uin: uin,
+        cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+        cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+        instanceYaml: instanceYaml,
+        },LogLevel.Info
+      )
       cli.sessionStop('success', t('获取日志成功'));
     } else {
       cli.sessionStart(t('监听中'));
@@ -208,10 +224,24 @@ module.exports = async (config, cli, command) => {
       };
       await logInterval();
     }
-  } catch (e) {
+  } catch (err) {
+    // 上报命令执行错误日志
+    if (err && err.message) {
+      // 上报失败日志
+      reportLogger({ 
+        logMessage: `${command} failed: ${err.message}`,
+        cliCommand: command,
+        cliDuration: computeDuration(reportLogStartTime),
+        appId: orgUid,
+        uin,
+        cliComponent: instanceYaml && instanceYaml.component ? instanceYaml.component :  '',
+        cliAppName: instanceYaml  ? (instanceYaml.app || instanceYaml.name || '')  : '',
+        instanceYaml: instanceYaml
+      },LogLevel.Error)
+    }
     telemtryData.outcome = 'failure';
-    telemtryData.failure_reason = e.message;
-    await storeLocally(telemtryData, e);
-    throw e;
+    telemtryData.failure_reason = err.message;
+    await storeLocally(telemtryData, err);
+    throw err;
   }
 };

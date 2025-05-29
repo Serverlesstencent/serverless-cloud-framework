@@ -9,6 +9,9 @@ const { v4: uuidv4 } = require('uuid');
 const utils = require('../libs/utils');
 const { loadServerlessFile } = require('../libs/serverlessFile');
 const t = require('../../i18n');
+const {computeDuration,reportLogger} = require('../libs/reports/index')
+const { LogLevel } = require('../libs/reports/constants');
+
 
 /**
  * Publish a Package(Component or Template) to the Serverless Registry
@@ -218,7 +221,6 @@ const getPackage = async (config, cli) => {
 
   // Start CLI persistance status
   cli.sessionStart(t('正在获取版本: {{packageName}}', { packageName }));
-
   const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
   let data;
   try {
@@ -243,7 +245,6 @@ const getPackage = async (config, cli) => {
   if (devVersion !== -1) {
     data.versions.splice(devVersion, 1);
   }
-
   cli.logRegistryLogo();
   cli.log();
   cli.log(`${data.type === 'template' ? 'Template' : 'Component'}: ${packageName}`);
@@ -274,6 +275,9 @@ const getPackage = async (config, cli) => {
  */
 const listFeatured = async (config, cli) => {
   cli.logRegistryLogo();
+  //初始化开始时间值
+  const startTime = new Date().getTime()
+  const command = 'registry'
 
   try {
     const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
@@ -282,6 +286,13 @@ const listFeatured = async (config, cli) => {
     });
 
     if (featuredTemplates.length > 0) {
+      // 上报成功日志
+      reportLogger({
+        logMessage:`${command} success`,
+        cliCommand: command ,
+        cliDuration: computeDuration(startTime),
+        },LogLevel.Info
+      )
       cli.log();
       cli.log(t('运行 "scf init <package>" 安装组件或者模版...'));
       cli.log();
@@ -300,6 +311,16 @@ const listFeatured = async (config, cli) => {
     cli.sessionStop('close', t('查看更多: https://github.com/serverless-components?q=tencent'));
     return null;
   } catch (e) {
+    // 上报命令执行错误日志
+    if (e && e.message) {
+      reportLogger(
+        { 
+          logMessage: `${command} failed: ${e.message}`,
+          cliCommand: command,
+          cliDuration: computeDuration(startTime),
+        },LogLevel.Error
+      )
+    }
     if (!e.extraErrorInfo) {
       e.extraErrorInfo = {
         step: t('组件列表获取'),
