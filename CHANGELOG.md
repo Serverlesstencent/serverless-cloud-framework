@@ -1,3 +1,12 @@
+## 1.3.1 (2025-10-22)
+
+
+### Bug Fixes
+
+* cli主要操作接入监控日志上报 c856952
+* 修复安装beta版本cli出现监控[@opentelemetry](http://git.woa.com/opentelemetry)依赖404问题 a5ab0b2
+* 修复自研流水线devcloud子机上的部署ssl报错问题 644c5b6
+
 # 1.3.0 (2025-04-09)
 
 
