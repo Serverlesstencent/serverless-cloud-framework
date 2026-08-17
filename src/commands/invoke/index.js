@@ -196,7 +196,14 @@ module.exports = async (config, cli, command) => {
       delete res.retMsg;
       cli.logOutputs(res);
       cli.log('---------------------------------------------');
-      cli.log(`Serverless: ${chalk.green('调用成功')}`);
+      // 修复invoke执行非200状态码显示调用成功的问题
+      if (res.invokeResult === 200) {
+        cli.log(`Serverless: ${chalk.green('调用成功')}`);
+      } else if (res.invokeResult === 202) {
+        cli.log(`Serverless: ${chalk.gray('调用中...')}`);
+      } else {
+        cli.log(`Serverless: ${chalk.red('调用失败')}`);
+      }
       cli.log();
       try {
         const retJson = JSON.parse(retMsg);

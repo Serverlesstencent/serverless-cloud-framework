@@ -33,6 +33,11 @@ i18next
   .init({
     fallbackLng: getLangEnv(),
     supportedLngs: ['en', 'zh'],
+    // CLI 场景输出到终端，不能对插值做 HTML 转义，
+    // 否则 URL 中的 "/" 会变成 "&#x2F;"、">" 变成 "&gt;" 等，显示异常。
+    interpolation: {
+      escapeValue: false,
+    },
     resources: {
       en: {
         translation: require('./translation/en.json')
