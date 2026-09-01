@@ -60,6 +60,19 @@ module.exports = (env, argv) => {
       minimizer: [
         new TerserPlugin({
           extractComments: false, // 禁用提取许可证
+          terserOptions: {
+            // 限定压缩输出的 ECMAScript 版本上限为 ES5，
+            // 避免 Terser 把 `x == null ? y : x` / `a && a.b` 等 ES5 写法
+            // 自动优化（折叠）成 Node 12 不支持的 `??` / `?.` 语法，
+            // 导致低版本 Node 环境下 require 时抛出 SyntaxError。
+            ecma: 5,
+            compress: {
+              ecma: 5,
+            },
+            output: {
+              ecma: 5,
+            },
+          },
         }),
       ],
       splitChunks: {
