@@ -6,6 +6,7 @@
 * 修复scf cli检测最新版本异常问题 842f4fd
 * 修复依赖axios依赖包不兼容node12的问题 c41e641
 * 流水线误修改的发布记录，可忽略 f0c836b
+* 重新更新package.json的版本为1.40,避免semantic-release识别不到待发布的版本
 
 
 ### Features
